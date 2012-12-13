@@ -1,0 +1,71 @@
+
+Oh shit sound effects!
+What sound effects do we need?
+ * Bullet fire
+ * Sword swing
+ * Jump
+ * Capture
+ * Teleport
+ * Invader hit
+ * Enemy hit
+ * Enemy destoyed
+ * Invader destroyed
+ * Building destroyed
+
+
+Well we have sound effects now, but they don't freakin' work on Linux!  Ugh!
+
+Destroying an engine should make the planet unsteerable!
+
+
+Damage effects when someone is hit (invader should have green blood)
+Clean up planet-snagging code and make it choose closest planet
+Make cutting a vine work on either end of it
+Graphics improvements:
+ * Draw order
+ * Vines?
+ * Particles for blood, hit effects, vines/teleporter, breaking vines (fragments!), fire/smoke,
+   planet rotation,
+ * Fix graphics offset so things rest on the surface
+
+Clean up universe gen code some...  Add minimap or other indicators?
+Performance???  Can we profile?
+Add more background buildings... cannons, maybe, plus invader buildings
+Win condition: Conquer the universe.  Game over screens?
+Powerups!
+Skysmashers?
+
+
+Impose draw order: Planets are lowest, then buildings, then civvies, then soldiers, then
+invaders.  Particles are above planets but below everything else...
+In case of overlapping planets, the planet the player is on should always be (re?)drawn last.
+Small buildings should also be drawn before large buildings, so you get a background effect.
+
+Powerups?  Different weapons?  Powerups could be longer vines, better weapons, healing, better
+engine thrust/turning...
+
+
+
+Mixing actual coordinates and rotational coordinates is a pain in the ASS.
+
+I really should have a much more powerful and high-level set of combinators for object
+interactions.  That would help a lot, I think.  But, no time to refactor!
+
+
+Name:
+Planet Pirates?
+
+
+Other buildings:
+Small shack
+Medium house
+Big building
+Planet drive
+Pirate houses
+Defense bases?  Even if only decorative.
+
+
+
+Base weapon is a bigass axe.
+
+Skysmashers!
