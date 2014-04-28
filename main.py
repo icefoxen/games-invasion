@@ -2,6 +2,7 @@
 
 import pygame
 from pygame.locals import *
+import cProfile
 
 import os
 
@@ -110,6 +111,7 @@ def main():
     #pygame.font.init()
     # TODO: Choose resolution
     mainloop(800, 600)
+    #cProfile.run('mainloop(800, 600)')
 
     # Called when interpreter exits anyway
     #pygame.quit()

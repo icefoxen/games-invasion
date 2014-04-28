@@ -69,3 +69,47 @@ Defense bases?  Even if only decorative.
 Base weapon is a bigass axe.
 
 Skysmashers!
+
+
+Okay, outstanding issues:
+No death effects for buildings
+Radial position code sucks in general
+Drawing is slow.
+EASY TO GET LOST -- make the universe wrap, make a minimap or global map
+Sound is a little extreme
+No music
+Hit effects should be better
+Art should be better
+Planets could stand to be prettier
+The teleporter and capture beam are ugly
+Enemies don't invade you back
+Enemy bullets travel a radial distance, not a linear distance
+Universe generation sucks
+Score and position display sucks
+More enemies and variety in behavior
+Better background (how?)
+
+Slow things:
+sprite.draw
+vec.fromAngle
+world.screenCoords
+world.draw
+pygame.surface.blit
+
+Sorta slow things:
+vec.mag
+vec.new
+vec.add
+vec.sub
+vec.mul
+Particles.update
+particles.draw
+pygame.draw.circle
+pygame.surface.fill
+pygame.surface.get_size
+
+Wishlist:
+Component based?
+SDL2?
+Levels?
+Variable screen size?
