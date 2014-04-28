@@ -1,13 +1,17 @@
-import pygame
-from pygame.locals import *
+#import pygame
+#from pygame.locals import *
+
+import sdl2
+#import sdl2.sdlimage
+import sdl2.ext
 
 import os
 
-import sprite
+#RES = sdl2.ext.Resources(__file__, 'data')
 
 def loadImage(name):
-    a = pygame.image.load(os.path.join("images", name) + ".png")
-    return a.convert_alpha()
+    a = sdl2.ext.load_image(os.path.join("images", name) + ".png")
+    return 
 
 def loadSound(name):
     a = pygame.mixer.Sound(os.path.join("sound", name) + ".ogg")

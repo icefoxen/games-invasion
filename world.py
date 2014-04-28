@@ -1,6 +1,7 @@
 
-import pygame
-from pygame.locals import *
+#import pygame
+#from pygame.locals import *
+import sdl2
 
 import math
 import random

@@ -1,8 +1,10 @@
 # Not to be confused with Pygame sprites, which are not quite the same!
 # Should also probably use the resource loader so we don't make a mojillion rotozoomed copies
 
-import pygame
-from pygame.locals import *
+#import pygame
+#from pygame.locals import *
+
+import sdl2
 
 import math
 

@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
-import pygame
-from pygame.locals import *
+#import pygame
+#from pygame.locals import *
+from sdl2 import *
+import sdl2.ext
+import sdl2.sdlimage
+import sdl2.sdlmixer
+import sdl2.sdlttf
 import cProfile
 
 import os
@@ -53,12 +58,13 @@ def doGameOver(surf):
     
     
 def mainloop(screenw, screenh):
-    surf = pygame.display.set_mode((screenw, screenh), 0, 0)
-    font = pygame.font.Font("data/FreeMono.ttf", 14)
+    surf = sdl2.ext.Window("Invasion of the Planet Snatchers!", size=(800,600))
+    surf.show()
+    font = sdl2.sdlttf.TTF_OpenFont("data/FreeMono.ttf", 14)
     doTitleScreen(surf)
 
     gs = GameState(screenw, screenh)
-    lastframe = pygame.time.get_ticks()
+    lastframe = sdl2.SDL_GetTicks()
     framecount = 0
     pygame.event.clear()
     while gs.gameRunning:
@@ -107,7 +113,10 @@ def mainloop(screenw, screenh):
 
 
 def main():
-    pygame.init()
+    sdl2.ext.init()
+
+    sdl2.sdlmixer.Mix_Init(sdl2.sdlmixer.MIX_INIT_OGG)
+    sdl2.sdlttf.TTF_Init()
     #pygame.font.init()
     # TODO: Choose resolution
     mainloop(800, 600)

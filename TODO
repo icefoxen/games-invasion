@@ -113,3 +113,12 @@ Component based?
 SDL2?
 Levels?
 Variable screen size?
+
+
+I'm really a little grumpy with PySDL2's extensions...
+Here's things that are missing:
+
+sdl2.ext.Resources should have a way to add multiple paths
+sdl2.ext.Resources.files is undocumented
+It needs a sound loader routine to match the image loader
+How do you get the renderer off a window?
