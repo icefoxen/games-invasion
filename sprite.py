@@ -14,7 +14,7 @@ NUMROTS = 128
 
 class Sprite(object):
     def __init__(s, img):
-        s.img = 0 # XXX resource.getImage(img)
+        s.img = resource.getImage(img)
         s.rots = []
         for i in range(NUMROTS):
             rz = 0 # XXX: pygame.transform.rotozoom(s.img, -((i / float(NUMROTS)) * 360.0), 1.0)
@@ -29,5 +29,7 @@ class Sprite(object):
         w = w / 2
         h = h / 2
         sc = vec.sub(sc, vec.new(w, h))
+        s.img.blit(w, h)
         #surf.blit(s.img, sc)
-        surf.blit(s.rots[ang], sc)
+        # XXX  surf.blit(s.rots[ang], sc)
+        
