@@ -1,16 +1,20 @@
-import pygame
-from pygame.locals import *
+import pyglet
 
 import os
 
 import sprite
 
-def loadImage(name):
-    a = pygame.image.load(os.path.join("images", name) + ".png")
-    return a.convert_alpha()
+# Doesn't search recursively.
+pyglet.resource.path = ['images', 'sound']
+pyglet.resource.reindex()
 
+def loadImage(name):
+    a = pyglet.resource.image(name + ".png")
+    return a
+
+# XXX: Sort out AVbin and make oggs work
 def loadSound(name):
-    a = pygame.mixer.Sound(os.path.join("sound", name) + ".ogg")
+    a = pyglet.resource.media(name + ".wav", streaming=False)
     return a
 
 # ...fuck I'm going to have to rotate sprites.

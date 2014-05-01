@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import pygame
-from pygame.locals import *
+import pyglet
 import cProfile
 
 import os
@@ -27,88 +26,82 @@ def handleInput(gs):
 
 
 # XXX: Stretch image to fill full screen?  Center images?
-def doTitleScreen(surf):
+def doTitleScreen(window):
     logo = resource.loadImage("logo")
     title = resource.loadImage("title")
-    surf.fill(pygame.Color(0, 0, 0))
-    surf.blit(logo, (0, 0))
-    pygame.display.flip()
-    pygame.time.wait(2000)
+    fpsDisplay = pyglet.clock.ClockDisplay()
+    @window.event
+    def on_draw():
+        window.clear()
+        logo.blit(0,0)
+        fpsDisplay.draw()
+        
 
-    surf.fill(pygame.Color(0, 0, 0))
-    surf.blit(title, (0, 0))
-    pygame.display.flip()
-    pygame.event.clear()
-    while True:
-        for e in pygame.event.get():
-            if e.type == KEYDOWN:
-                return
+    #surf.fill(pygame.Color(0, 0, 0))
+    #surf.blit(logo, (0, 0))
+    #pygame.display.flip()
+    #pygame.time.wait(2000)
 
-def doGameOver(surf):
+    #surf.fill(pygame.Color(0, 0, 0))
+    #surf.blit(title, (0, 0))
+    #pygame.display.flip()
+    #pygame.event.clear()
+    #while True:
+    #    for e in pygame.event.get():
+    #        if e.type == KEYDOWN:
+    #            return
+
+def doGameOver(window):
     gameover = resource.loadImage("gameover")
-    surf.fill(pygame.Color(0, 0, 0))
-    surf.blit(gameover, (0, 0))
-    pygame.display.flip()
-    pygame.time.wait(2000)
-    
-    
+    window.clear()
+    gameover.blit(0,0)
+    def doClose(dt):
+        window.close()
+    pyglet.clock.schedule_once(doClose, 2000)
+
+
 def mainloop(screenw, screenh):
-    surf = pygame.display.set_mode((screenw, screenh), 0, 0)
-    font = pygame.font.Font("data/FreeMono.ttf", 14)
-    doTitleScreen(surf)
+    window = pyglet.window.Window(width=screenw, height=screenh)
+    window.set_vsync(False)
+    # XXX: The animation state here is a little wibbly, work on it.
+    #doTitleScreen(window)
 
     gs = GameState(screenw, screenh)
-    lastframe = pygame.time.get_ticks()
-    framecount = 0
-    pygame.event.clear()
-    while gs.gameRunning:
-        # Clear screen
-        surf.fill(pygame.Color(0, 0, 0))
+    fpsDisplay = pyglet.clock.ClockDisplay()
 
-        # Handle timer
-        # dt is in seconds
-        now = pygame.time.get_ticks()
-        dt = (now - lastframe) / 1000.0
-        lastframe = now
-        framecount += 1
-
-        # Handle input
-        handleInput(gs)
-
-        # Update game state
-        gs.update(dt)
-
-        # Draw stuff
-        gs.background.draw(surf, gs)
-        gs.player.draw(surf, gs)
-
+    @window.event
+    def on_draw():
+        window.clear()
+        gs.background.draw(window, gs)
+        gs.player.draw(window, gs)
         for p in gs.particles:
-            p.draw(surf, gs)
+            p.draw(window, gs)
         for p in gs.planets:
-            p.draw(surf, gs)
+            p.draw(window, gs)
             for f in p.surfFeatures:
-                f.draw(surf, gs)
-        statText = "X: {0:5.2f}  Y: {1:5.2f}  Velocity: ({2:5.2f}, {3:5.2f})  Hits: {4}".format(\
-            gs.camerax, gs.cameray, gs.player.parent.vel[0], gs.player.parent.vel[1], gs.player.hits)
-        display = font.render(statText, True, pygame.Color(255, 255, 255), pygame.Color(0,0,0))
-        surf.blit(display, (0, 0))
+                f.draw(window, gs)
+                
+        fpsDisplay.draw()
 
-        pygame.display.flip()
+    def updateGame(dt):
+        gs.update(dt)
+        if not gs.player.alive:
+            doGameOver(window)
+    
+    # Game physics get updated at 30FPS
+    pyglet.clock.schedule_interval(updateGame, 1/30.0)
+    
+    pyglet.app.run()
 
-    if not gs.player.alive:
-        doGameOver(surf)
 
-    seconds = pygame.time.get_ticks() / 1000.0
-    fps = framecount / seconds
-    print("Game ran %s seconds, average %s fps" % (seconds, fps))
-    print("Thank you for playing!")
-    print("This might crash on Windows; I can't seem to fix it.  :-(")
+#    statText = "X: {0:5.2f}  Y: {1:5.2f}  Velocity: ({2:5.2f}, {3:5.2f})  Hits: {4}".format(\
+#        gs.camerax, gs.cameray, gs.player.parent.vel[0], gs.player.parent.vel[1], gs.player.hits)
+#    display = font.render(statText, True, pygame.Color(255, 255, 255), pygame.Color(0,0,0))
+
     
 
 
 def main():
-    pygame.init()
-    #pygame.font.init()
     # TODO: Choose resolution
     mainloop(800, 600)
     #cProfile.run('mainloop(800, 600)')

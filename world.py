@@ -1,6 +1,5 @@
 
-import pygame
-from pygame.locals import *
+import pyglet
 
 import math
 import random
@@ -49,7 +48,7 @@ class Background(object):
                 dist = vec.mag(vec.new(gs.camerax, gs.cameray))
                 relativeDist = dist / gs.universeSize
                 brightness = 255 - min(255, int(255 * relativeDist))
-                pygame.draw.circle(surf, pygame.Color(brightness,brightness,brightness), (i-xoff,j-yoff), 2)
+                #XXX: pygame.draw.circle(surf, pygame.Color(brightness,brightness,brightness), (i-xoff,j-yoff), 2)
 
 # XXX: How do we handle the edges of the universe?
 # Just have things bounce off of them.
@@ -147,7 +146,7 @@ class GameState(object):
             s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
-        p.color = pygame.Color(200, 0, 0)
+        p.color = 0 # XXX pygame.Color(200, 0, 0)
         p.addSurfFeature(s.player, 0.1)
         p.addBuilding('engine', 0.0)
         #s.planets[0].parent = p
@@ -201,7 +200,7 @@ class GameObj(object):
     def draw(s, surf, gs):
         # XXX: Bounds checking on surface?
         sloc = gs.screenCoords(s.loc)
-        pygame.draw.circle(surf, pygame.Color(255, 255, 255), sloc, 20, 0)
+        # XXX: pygame.draw.circle(surf, pygame.Color(255, 255, 255), sloc, 20, 0)
 
     def die(s, gs):
         pass
@@ -258,7 +257,7 @@ class Planet(PhysicsObj):
         r = random.randrange(64, 255)
         g = random.randrange(64, 255)
         b = random.randrange(64, 255)
-        s.color = pygame.Color(r, g, b)
+        s.color = 0 # XXX: pygame.Color(r, g, b)
 
         s.parent = None
         s.parentVec = vec.ZERO
@@ -297,7 +296,7 @@ class Planet(PhysicsObj):
 
     def draw(s, surf, gs):
         sloc = gs.screenCoords(s.loc)
-        pygame.draw.circle(surf, s.color, sloc, int(s.radius), 0)
+        # XXX: pygame.draw.circle(surf, s.color, sloc, int(s.radius), 0)
         #offset = vec.fromAngle(s.facing)
         #offset = vec.mul(offset, s.radius)
         #offset = vec.add(sloc, offset)
@@ -414,24 +413,27 @@ class SteerablePlanet(Planet):
         s.thrusting = False
         s.turning = 0.0
 
+    # XXX
     def handleInputStart(s, gs, key):
-        if key == K_UP:
-            s.thrusting = True
-            s.engineSound.play(loops=-1, fade_ms=200)
-            
-        elif key == K_LEFT:
-            s.turning = -1.0
-        elif key == K_RIGHT:
-            s.turning = 1.0
+        pass
+        #if key == K_UP:
+        #    s.thrusting = True
+        #    s.engineSound.play(loops=-1, fade_ms=200)
+        #    
+        #elif key == K_LEFT:
+        #    s.turning = -1.0
+        #elif key == K_RIGHT:
+        #    s.turning = 1.0
 
     def handleInputEnd(s, gs, key):
-        if key == K_UP:
-            s.thrusting = False
-            s.engineSound.fadeout(500)
-        elif key == K_LEFT:
-            s.turning = 0
-        elif key == K_RIGHT:
-            s.turning = 0        
+        pass
+        #if key == K_UP:
+        #    s.thrusting = False
+        #    s.engineSound.fadeout(500)
+        #elif key == K_LEFT:
+        #    s.turning = 0
+        #elif key == K_RIGHT:
+        #    s.turning = 0        
 
 
     def update(s, gs, dt):
@@ -875,13 +877,16 @@ class AI(object):
 
     # Wander: Just amble back and forth
     def doWander(s, gs):
-        s.controlled.handleInputEnd(gs, K_LEFT)
-        s.controlled.handleInputEnd(gs, K_RIGHT)
+        # XXX
+        #s.controlled.handleInputEnd(gs, K_LEFT)
+        #s.controlled.handleInputEnd(gs, K_RIGHT)
         r = random.random()
         if r < 0.3:
-            s.controlled.handleInputStart(gs, K_LEFT)
+            pass
+        #    s.controlled.handleInputStart(gs, K_LEFT)
         elif r < 0.6:
-            s.controlled.handleInputStart(gs, K_RIGHT)
+            pass
+        #    s.controlled.handleInputStart(gs, K_RIGHT)
         else:
             # Stand where you are.
             pass
@@ -889,44 +894,48 @@ class AI(object):
     # Attacking: Find an invader on the planet, approach to some range,
     # and open fire while trying to keep distance
     def doAttack(s, gs):
-        s.controlled.handleInputEnd(gs, K_LEFT)
-        s.controlled.handleInputEnd(gs, K_RIGHT)
+        # XXX
+        #s.controlled.handleInputEnd(gs, K_LEFT)
+        #s.controlled.handleInputEnd(gs, K_RIGHT)
         runfrom = gs.player.loc
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
         desiredDistance = PIOVERFOUR
         if distance > PIOVERFOUR:
-            s.controlled.handleInputStart(gs, K_RIGHT)
+            #s.controlled.handleInputStart(gs, K_RIGHT)
             s.controlled.attack(gs)
         elif distance > 0:
-            s.controlled.handleInputStart(gs, K_RIGHT)
+            #s.controlled.handleInputStart(gs, K_RIGHT)
             s.controlled.attack(gs)
-            s.controlled.handleInputStart(gs, K_LEFT)
+            #s.controlled.handleInputStart(gs, K_LEFT)
         elif distance < -PIOVERFOUR:
-            s.controlled.handleInputStart(gs, K_LEFT)
+            #s.controlled.handleInputStart(gs, K_LEFT)
             s.controlled.attack(gs)
         elif distance < 0:
-            s.controlled.handleInputStart(gs, K_LEFT)
+            #s.controlled.handleInputStart(gs, K_LEFT)
             s.controlled.attack(gs)
-            s.controlled.handleInputStart(gs, K_RIGHT)
+            #s.controlled.handleInputStart(gs, K_RIGHT)
 
 
         
 
     # Running: Find invader on the planet, move away from them.
     def doRun(s, gs):
-        s.controlled.handleInputEnd(gs, K_LEFT)
-        s.controlled.handleInputEnd(gs, K_RIGHT)
+        # XXX
+        #s.controlled.handleInputEnd(gs, K_LEFT)
+        #s.controlled.handleInputEnd(gs, K_RIGHT)
         # I don't believe it this freakin' works.
         runfrom = gs.player.loc
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
         if distance < 0:
-            s.controlled.handleInputStart(gs, K_RIGHT)
+            pass
+            #s.controlled.handleInputStart(gs, K_RIGHT)
         else:
-            s.controlled.handleInputStart(gs, K_LEFT)
+            pass
+            #s.controlled.handleInputStart(gs, K_LEFT)
 
     def command(s, gs):
         if s.state == AISTATE.Wander:
