@@ -8,10 +8,6 @@ import sprite
 pyglet.resource.path = ['images', 'sound']
 pyglet.resource.reindex()
 
-def loadImage(name):
-    a = pyglet.resource.image(name + ".png")
-    return a
-
 # XXX: Sort out AVbin and make oggs work
 def loadSound(name):
     a = pyglet.resource.media(name + ".wav", streaming=False)
@@ -30,23 +26,14 @@ def loadSound(name):
 # the CENTER of the sprite.
 IMAGES = {}
 def getImage(name):
-    if IMAGES.has_key(name):
-        return IMAGES[name]
-    else:
-        a = loadImage(name)
-        IMAGES[name] = a
-        return a
+    # Pyglet already caches images
+    return pyglet.resource.image(name + '.png')
 
 
 
-SPRITES = {}
 def getSprite(name):
-    if SPRITES.has_key(name):
-        return SPRITES[name]
-    else:
-        a = sprite.Sprite(name)
-        SPRITES[name] = a
-        return a
+    img = getImage(name)
+    return pyglet.sprite.Sprite(img)
 
 
 SOUNDS = {}

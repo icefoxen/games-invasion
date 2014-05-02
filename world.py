@@ -6,7 +6,7 @@ import random
 
 import particles
 import resource
-import sprite
+#import sprite
 import vec
 
 TWOPI = math.pi * 2
@@ -14,9 +14,15 @@ PIOVERTWO = math.pi / 2
 PIOVERFOUR = math.pi / 4
 
 
+# XXX: Make this work
 class Background(object):
     def __init__(s):
-        pass
+        starstep = 100
+        s.stars = []        
+        #for i in range(starstep):
+        #    for j in range(starstep):
+        s.starsprite = resource.getSprite('planet')
+        s.starsprite.scale = 0.1
         
     # XXX: Only draw things in screen view
     # Seems that pygame handles that for us...
@@ -198,9 +204,7 @@ class GameObj(object):
         s.alive = True
 
     def draw(s, surf, gs):
-        # XXX: Bounds checking on surface?
-        sloc = gs.screenCoords(s.loc)
-        # XXX: pygame.draw.circle(surf, pygame.Color(255, 255, 255), sloc, 20, 0)
+        pass
 
     def die(s, gs):
         pass
@@ -265,6 +269,12 @@ class Planet(PhysicsObj):
         s.capturedFacing = 0.0
         s.children = []
         s.surfFeatures = []
+        s.sprite = s._getPlanetSprite()
+        scale = radius / 64.0
+        s.sprite.scale = scale
+
+    def _getPlanetSprite(self):
+        return resource.getSprite('planet')
 
 
     def addSurfFeature(s, feat, loc):
@@ -296,14 +306,11 @@ class Planet(PhysicsObj):
 
     def draw(s, surf, gs):
         sloc = gs.screenCoords(s.loc)
-        # XXX: pygame.draw.circle(surf, s.color, sloc, int(s.radius), 0)
-        #offset = vec.fromAngle(s.facing)
-        #offset = vec.mul(offset, s.radius)
-        #offset = vec.add(sloc, offset)
-        #pygame.draw.circle(surf, pygame.Color(255,255,255), vec.toInt(offset), 10, 0)
+        s.sprite.position = sloc
+        s.sprite.draw()
         if s.parent != None:
             parentSloc = gs.screenCoords(s.parent.loc)
-            pygame.draw.line(surf, pygame.Color(0, 0, 255), sloc, parentSloc)
+            # XXX pygame.draw.line(surf, pygame.Color(0, 0, 255), sloc, parentSloc)
     
     
     # A bit of an ugly hack, buuuuut...
@@ -491,10 +498,11 @@ class SurfFeature(GameObj):
         totalAngle = vec.fromAngle(rot)
         offset = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offset)
-        s.sprite.draw(surf, gs, location, s.loc + s.parent.facing)
-        #sc = gs.screenCoords(location)
-        #surf.blit(s.sprite, sc)
-        #pygame.draw.circle(surf, pygame.Color(0,0,255), sc, 10, 0)
+        sc = gs.screenCoords(location)
+        s.sprite.position = sc
+        s.sprite.rotation = vec.rad2degree(s.loc + s.parent.facing)
+        s.sprite.draw()
+
 
     def move(s, amount):
         s.loc += amount
@@ -858,7 +866,10 @@ class Blade(SurfFeature):
         totalAngle = vec.fromAngle(rot)
         offset = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offset)
-        s.sprite.draw(surf, gs, location, s.loc + s.parent.facing + swing)
+        s.sprite.position = location
+        s.sprite.rotation = vec.rad2degree(rot)
+        s.sprite.draw()
+
 
     def die(s, gs):
         pass

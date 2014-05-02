@@ -6,6 +6,8 @@ import math
 ZERO = (0.0, 0.0)
 X = (1.0, 0.0)
 Y = (0.0, 1.0)
+PIOVER2 = math.pi / 2
+PIOVER4 = math.pi / 4
 
 def new(x, y): return (float(x), float(y))
 
@@ -98,3 +100,9 @@ def rotate(v, angle):
 
 def invert(v):
     return mul(v, -1.0)
+
+def rad2degree(rads):
+    return rads * (180 / math.pi)
+
+def degree2rad(deg):
+    return deg * (math.pi / 180)

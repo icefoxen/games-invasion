@@ -55,14 +55,18 @@ def doGameOver(window):
     gameover = resource.loadImage("gameover")
     window.clear()
     gameover.blit(0,0)
+
     def doClose(dt):
         window.close()
     pyglet.clock.schedule_once(doClose, 2000)
 
 
-def mainloop(screenw, screenh):
+def main():
+    # TODO: Choose resolution
+    screenw = 800
+    screenh = 600
     window = pyglet.window.Window(width=screenw, height=screenh)
-    window.set_vsync(False)
+    #window.set_vsync(False)
     # XXX: The animation state here is a little wibbly, work on it.
     #doTitleScreen(window)
 
@@ -97,18 +101,6 @@ def mainloop(screenw, screenh):
 #    statText = "X: {0:5.2f}  Y: {1:5.2f}  Velocity: ({2:5.2f}, {3:5.2f})  Hits: {4}".format(\
 #        gs.camerax, gs.cameray, gs.player.parent.vel[0], gs.player.parent.vel[1], gs.player.hits)
 #    display = font.render(statText, True, pygame.Color(255, 255, 255), pygame.Color(0,0,0))
-
-    
-
-
-def main():
-    # TODO: Choose resolution
-    mainloop(800, 600)
-    #cProfile.run('mainloop(800, 600)')
-
-    # Called when interpreter exits anyway
-    #pygame.quit()
-
 
 if __name__ == '__main__':
     main()

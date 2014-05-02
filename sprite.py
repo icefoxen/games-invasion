@@ -28,7 +28,6 @@ class Sprite(object):
         (w,h) = (1,1) # XXX s.rots[ang].get_size()
         w = w / 2
         h = h / 2
-        sc = vec.sub(sc, vec.new(w, h))
         s.img.blit(w, h)
         #surf.blit(s.img, sc)
         # XXX  surf.blit(s.rots[ang], sc)
