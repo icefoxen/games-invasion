@@ -1,5 +1,6 @@
 
 import pyglet
+import pyglet.window.key as key
 
 import math
 import random
@@ -31,6 +32,7 @@ class Background(object):
     # We either want a tiled background, or a function we can plug
     # coordinates into that spits out a list of X appropriate stars
     # for the area...
+    # XXX: Still, this needs to be made better.
     def draw(s, surf, gs):
         starstep = 100
         # This would be nicer if it worked.  But, screw it for now.  More important things.
@@ -49,11 +51,15 @@ class Background(object):
 
         xoff = int(gs.camerax) % starstep
         yoff = int(gs.cameray) % starstep
+        sprite = resource.getSprite('warpspark')
         for i in range(0, gs.screenW + starstep, starstep):
             for j in range(0, gs.screenH + starstep, starstep):
                 dist = vec.mag(vec.new(gs.camerax, gs.cameray))
                 relativeDist = dist / gs.universeSize
                 brightness = 255 - min(255, int(255 * relativeDist))
+                sprite.x = i-xoff
+                sprite.y = j-yoff
+                sprite.draw()
                 #XXX: pygame.draw.circle(surf, pygame.Color(brightness,brightness,brightness), (i-xoff,j-yoff), 2)
 
 # XXX: How do we handle the edges of the universe?
@@ -300,13 +306,12 @@ class Planet(PhysicsObj):
         b = Civvie()
         s.addSurfFeature(b, loc)
 
-
-
-
-
     def draw(s, surf, gs):
-        sloc = gs.screenCoords(s.loc)
-        s.sprite.position = sloc
+        sx, sy = gs.screenCoords(s.loc)
+        sx -= s.radius
+        sy -= s.radius
+        s.sprite.x = sx
+        s.sprite.y = sy
         s.sprite.draw()
         if s.parent != None:
             parentSloc = gs.screenCoords(s.parent.loc)
@@ -603,7 +608,7 @@ class Dude(SurfFeature):
         s.controlling = False
         s.parent.clearInput()
 
-    def handleInputStart(s, gs, key):
+    def on_key_press(s, gs, key):
         if key == K_SPACE:
             if not s.controlling:
                 s.startControl()

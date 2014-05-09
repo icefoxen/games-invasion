@@ -2,8 +2,6 @@ import pyglet
 
 import os
 
-import sprite
-
 # Doesn't search recursively.
 pyglet.resource.path = ['images', 'sound']
 pyglet.resource.reindex()

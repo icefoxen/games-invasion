@@ -52,6 +52,7 @@ def doTitleScreen(window):
     #            return
 
 def doGameOver(window):
+    window.pop_handlers()
     gameover = resource.loadImage("gameover")
     window.clear()
     gameover.blit(0,0)
@@ -87,6 +88,12 @@ def main():
                 
         fpsDisplay.draw()
 
+    def on_key_press(symbol, modifiers):
+        print symbol, modifiers
+
+    def on_key_release(symbol, modifiers):
+        print symbol, modifiers
+
     def updateGame(dt):
         gs.update(dt)
         if not gs.player.alive:
@@ -94,7 +101,9 @@ def main():
     
     # Game physics get updated at 30FPS
     pyglet.clock.schedule_interval(updateGame, 1/30.0)
-    
+
+    # Add basic handlers for keypresses and releases.
+    window.push_handlers(on_key_press, on_key_release)
     pyglet.app.run()
 
 
