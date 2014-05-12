@@ -66,8 +66,9 @@ def doGameOver(window):
 
 def pushGameEventHandlers(window, gs):
     def on_key_press(key, modifiers):
-        if key == pyglet.window.key.Q:
+        if key == pyglet.window.key.ESCAPE:
             doGameOver(window)
+            return True
         gs.player.on_key_press(gs, key)
 
     def on_key_release(key, modifiers):

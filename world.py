@@ -868,6 +868,7 @@ class Blade(SurfFeature):
 
     # XXX: Not quite right; need to either fudge angles based on planet size
     # or do a coordinate transform to put it at a fixed pixel offset from the parent.
+    # XXX Why is this not drawing?  Ordering maybe?
     def draw(s, surf, gs):
         if s.direction > 0:
             swing = 8.5 - (s.lifetime * 6.0)
