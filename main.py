@@ -62,6 +62,16 @@ def doGameOver(window):
     pyglet.clock.schedule_once(doClose, 2000)
 
 
+def pushGameEventHandlers(window, gs):
+    def on_key_press(key, modifiers):
+        gs.player.on_key_press(gs, key)
+
+    def on_key_release(key, modifiers):
+        gs.player.on_key_release(gs, key)
+
+    # Add basic handlers for keypresses and releases.
+    window.push_handlers(on_key_press, on_key_release)    
+
 def main():
     # TODO: Choose resolution
     screenw = 800
@@ -88,12 +98,6 @@ def main():
                 
         fpsDisplay.draw()
 
-    def on_key_press(symbol, modifiers):
-        print symbol, modifiers
-
-    def on_key_release(symbol, modifiers):
-        print symbol, modifiers
-
     def updateGame(dt):
         gs.update(dt)
         if not gs.player.alive:
@@ -102,8 +106,7 @@ def main():
     # Game physics get updated at 30FPS
     pyglet.clock.schedule_interval(updateGame, 1/30.0)
 
-    # Add basic handlers for keypresses and releases.
-    window.push_handlers(on_key_press, on_key_release)
+    pushGameEventHandlers(window, gs)
     pyglet.app.run()
 
 

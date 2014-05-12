@@ -1,6 +1,6 @@
 
 import pyglet
-import pyglet.window.key as key
+import pyglet.window.key as keys
 
 import math
 import random
@@ -425,27 +425,24 @@ class SteerablePlanet(Planet):
         s.thrusting = False
         s.turning = 0.0
 
-    # XXX
-    def handleInputStart(s, gs, key):
-        pass
-        #if key == K_UP:
-        #    s.thrusting = True
-        #    s.engineSound.play(loops=-1, fade_ms=200)
-        #    
-        #elif key == K_LEFT:
-        #    s.turning = -1.0
-        #elif key == K_RIGHT:
-        #    s.turning = 1.0
+    def on_key_press(s, gs, key):
+        if key == keys.UP:
+            s.thrusting = True
+            s.engineSound.play(loops=-1, fade_ms=200)
+            
+        elif key == keys.LEFT:
+            s.turning = -1.0
+        elif key == keys.RIGHT:
+            s.turning = 1.0
 
-    def handleInputEnd(s, gs, key):
-        pass
-        #if key == K_UP:
-        #    s.thrusting = False
-        #    s.engineSound.fadeout(500)
-        #elif key == K_LEFT:
-        #    s.turning = 0
-        #elif key == K_RIGHT:
-        #    s.turning = 0        
+    def on_key_release(s, gs, key):
+        if key == keys.UP:
+            s.thrusting = False
+            s.engineSound.fadeout(500)
+        elif key == keys.LEFT:
+            s.turning = 0
+        elif key == keys.RIGHT:
+            s.turning = 0        
 
 
     def update(s, gs, dt):
@@ -609,21 +606,21 @@ class Dude(SurfFeature):
         s.parent.clearInput()
 
     def on_key_press(s, gs, key):
-        if key == K_SPACE:
+        if key == keys.SPACE:
             if not s.controlling:
                 s.startControl()
             else:
                 s.endControl()
         elif s.controlling:
-            s.parent.handleInputStart(gs, key)
+            s.parent.on_key_press(gs, key)
         else:
-            if key == K_LEFT:
+            if key == keys.LEFT:
                 s.facing = -1
                 s.moving = -1
-            elif key == K_RIGHT:
+            elif key == keys.RIGHT:
                 s.facing = 1
                 s.moving = 1
-            elif key == K_x:
+            elif key == keys.X:
                 # Try capture some nearby planet...
                 #print("Trying capture...")
                 for p in gs.planets:
@@ -638,7 +635,7 @@ class Dude(SurfFeature):
                         sound = resource.getSound("capture")
                         sound.play()
                         break
-            elif key == K_z:
+            elif key == keys.Z:
                 # Try uncapture
                 # XXX: At the moment we can't uncapture from the child side... hmm.
                 for p in s.parent.children:
@@ -655,14 +652,14 @@ class Dude(SurfFeature):
                         sound.play()
                         break
 
-            elif key == K_c:
+            elif key == keys.C:
                 if s.attackCooldown < 0.0:
                     s.attack(gs)
                     s.attackCooldown = s.attackCooldownTotal
                     s.attackSound.play()
                 
 
-            elif key == K_UP:
+            elif key == keys.UP:
                 # Transport to captured planet.
                 for p in s.parent.children:
                     facingpoint = (s.parent.facing + s.loc) % TWOPI
@@ -706,11 +703,11 @@ class Dude(SurfFeature):
 
                 
 
-    def handleInputEnd(s, gs, key):
+    def on_key_release(s, gs, key):
         if s.controlling:
-            s.parent.handleInputEnd(gs, key)
+            s.parent.on_key_release(gs, key)
         else:
-            if key == K_LEFT or key == K_RIGHT:
+            if key == keys.LEFT or key == keys.RIGHT:
                 s.moving = 0
             
     def update(s, gs, dt):
@@ -893,16 +890,14 @@ class AI(object):
 
     # Wander: Just amble back and forth
     def doWander(s, gs):
-        # XXX
-        #s.controlled.handleInputEnd(gs, K_LEFT)
-        #s.controlled.handleInputEnd(gs, K_RIGHT)
+        s.controlled.on_key_release(gs, keys.LEFT)
+        s.controlled.on_key_release(gs, keys.RIGHT)
         r = random.random()
         if r < 0.3:
-            pass
-        #    s.controlled.handleInputStart(gs, K_LEFT)
+            s.controlled.on_key_press(gs, keys.LEFT)
         elif r < 0.6:
             pass
-        #    s.controlled.handleInputStart(gs, K_RIGHT)
+            s.controlled.on_key_press(gs, keys.RIGHT)
         else:
             # Stand where you are.
             pass
@@ -910,48 +905,44 @@ class AI(object):
     # Attacking: Find an invader on the planet, approach to some range,
     # and open fire while trying to keep distance
     def doAttack(s, gs):
-        # XXX
-        #s.controlled.handleInputEnd(gs, K_LEFT)
-        #s.controlled.handleInputEnd(gs, K_RIGHT)
+        s.controlled.on_key_release(gs, keys.LEFT)
+        s.controlled.on_key_release(gs, keys.RIGHT)
         runfrom = gs.player.loc
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
         desiredDistance = PIOVERFOUR
         if distance > PIOVERFOUR:
-            #s.controlled.handleInputStart(gs, K_RIGHT)
+            s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
         elif distance > 0:
-            #s.controlled.handleInputStart(gs, K_RIGHT)
+            s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
-            #s.controlled.handleInputStart(gs, K_LEFT)
+            s.controlled.on_key_press(gs, keys.LEFT)
         elif distance < -PIOVERFOUR:
-            #s.controlled.handleInputStart(gs, K_LEFT)
+            s.controlled.on_key_press(gs, keys.LEFT)
             s.controlled.attack(gs)
         elif distance < 0:
-            #s.controlled.handleInputStart(gs, K_LEFT)
+            s.controlled.on_key_press(gs, keys.LEFT)
             s.controlled.attack(gs)
-            #s.controlled.handleInputStart(gs, K_RIGHT)
+            s.controlled.on_key_press(gs, keys.RIGHT)
 
 
         
 
     # Running: Find invader on the planet, move away from them.
     def doRun(s, gs):
-        # XXX
-        #s.controlled.handleInputEnd(gs, K_LEFT)
-        #s.controlled.handleInputEnd(gs, K_RIGHT)
+        s.controlled.on_key_release(gs, keys.LEFT)
+        s.controlled.on_key_release(gs, keys.RIGHT)
         # I don't believe it this freakin' works.
         runfrom = gs.player.loc
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
         if distance < 0:
-            pass
-            #s.controlled.handleInputStart(gs, K_RIGHT)
+            s.controlled.on_key_press(gs, keys.RIGHT)
         else:
-            pass
-            #s.controlled.handleInputStart(gs, K_LEFT)
+            s.controlled.on_key_press(gs, keys.LEFT)
 
     def command(s, gs):
         if s.state == AISTATE.Wander:
