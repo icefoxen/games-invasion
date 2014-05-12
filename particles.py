@@ -13,7 +13,7 @@ class Particle(object):
     def __init__(s, loc, vel, image, life):
         s.loc = loc
         s.vel = vel
-        s.img = resource.getImage(image)
+        s.img = resource.getSprite(image)
         s.life = life
         s.alive = True
 
@@ -26,7 +26,8 @@ class Particle(object):
 
     def draw(s, surf, gs):
         sloc = gs.screenCoords(s.loc)
-        surf.blit(s.img, sloc)
+        surf.position = sloc
+        # XXX: surf.blit() # s.img, sloc)
         
 
 # It'd look better if we had actual fire puffs that expanded as they went

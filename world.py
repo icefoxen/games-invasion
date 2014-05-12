@@ -428,7 +428,7 @@ class SteerablePlanet(Planet):
     def on_key_press(s, gs, key):
         if key == keys.UP:
             s.thrusting = True
-            s.engineSound.play(loops=-1, fade_ms=200)
+            s.engineSound.play() # loops=-1, fade_ms=200)
             
         elif key == keys.LEFT:
             s.turning = -1.0
@@ -438,7 +438,8 @@ class SteerablePlanet(Planet):
     def on_key_release(s, gs, key):
         if key == keys.UP:
             s.thrusting = False
-            s.engineSound.fadeout(500)
+            # XXX
+            # s.engineSound.fadeout(500)
         elif key == keys.LEFT:
             s.turning = 0
         elif key == keys.RIGHT:
@@ -496,7 +497,15 @@ class SurfFeature(GameObj):
             s.radius = parent.radius + 1.0
 
     def draw(s, surf, gs):
-        rot = s.parent.facing + s.loc
+        rot = s.parent.facing - s.loc
+        totalAngle = vec.fromAngle(rot)
+        offsetVec = vec.mul(totalAngle, s.radius)
+        location = vec.add(s.parent.loc, offsetVec)
+        sc = gs.screenCoords(location)
+        s.sprite.position = sc
+        s.sprite.draw()
+        return
+        rot = s.parent.facing - s.loc
         totalAngle = vec.fromAngle(rot)
         offset = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offset)

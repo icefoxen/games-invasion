@@ -8,33 +8,40 @@ import os
 from world import *
 import resource
 
-def handleInput(gs):
-    for e in pygame.event.get():
-        if e.type == QUIT:
-            gs.gameRunning = False
-        elif e.type == KEYDOWN:
-            #print("Key down event: %s" % e)
-            if e.key == K_ESCAPE:
-                gs.gameRunning = False
-            else:
-                gs.player.handleInputStart(gs, e.key)
-
-
-        elif e.type == KEYUP:
-            #print("Key up event: %s" % e)
-            gs.player.handleInputEnd(gs, e.key)
-
-
-# XXX: Stretch image to fill full screen?  Center images?
+# Okay, so this pushes two sets of event handlers onto the
+# event stack, which displays the splash and title screens.
+# With each of them, it also pushes an event handler that
+# pops the event stack when a key is pressed.
+# This is in contrast to the more straightforward state of
+# pushing the game's event handling atop the title screen's,
+# but oh well.
+# This is fiendishly order-dependent, because the game itself
+# is the bottom of the event handling stack, and these go atop
+# it.
+# Again, oh well!  That's state machines for you.  Especially
+# sort of implicit ones.
 def doTitleScreen(window):
-    logo = resource.loadImage("logo")
-    title = resource.loadImage("title")
-    fpsDisplay = pyglet.clock.ClockDisplay()
-    @window.event
-    def on_draw():
+    logo = resource.getSprite("logo")
+    logo.position = (0,0)
+    title = resource.getSprite("title")
+    title.position = (0,0)
+
+    def draw_logo():
         window.clear()
-        logo.blit(0,0)
-        fpsDisplay.draw()
+        logo.draw()
+        return True
+
+    def draw_title():
+        window.clear()
+        title.draw()
+        return True
+
+    def on_key_press(key, modifiers):
+        window.pop_handlers()
+        return True
+
+    window.push_handlers(on_draw=draw_title, on_key_press=on_key_press)
+    window.push_handlers(on_draw=draw_logo, on_key_press=on_key_press)
         
 
     #surf.fill(pygame.Color(0, 0, 0))
@@ -77,7 +84,7 @@ def main():
     screenw = 800
     screenh = 600
     window = pyglet.window.Window(width=screenw, height=screenh)
-    #window.set_vsync(False)
+    window.set_vsync(False)
     # XXX: The animation state here is a little wibbly, work on it.
     #doTitleScreen(window)
 
@@ -107,6 +114,7 @@ def main():
     pyglet.clock.schedule_interval(updateGame, 1/30.0)
 
     pushGameEventHandlers(window, gs)
+    doTitleScreen(window)
     pyglet.app.run()
 
 
