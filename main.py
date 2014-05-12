@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pyglet
+import pyglet.window.key
 import cProfile
 
 import os
@@ -44,33 +45,29 @@ def doTitleScreen(window):
     window.push_handlers(on_draw=draw_logo, on_key_press=on_key_press)
         
 
-    #surf.fill(pygame.Color(0, 0, 0))
-    #surf.blit(logo, (0, 0))
-    #pygame.display.flip()
-    #pygame.time.wait(2000)
-
-    #surf.fill(pygame.Color(0, 0, 0))
-    #surf.blit(title, (0, 0))
-    #pygame.display.flip()
-    #pygame.event.clear()
-    #while True:
-    #    for e in pygame.event.get():
-    #        if e.type == KEYDOWN:
-    #            return
-
 def doGameOver(window):
+    gameover = resource.getSprite("gameover")
+    gameover.position = (0,0)
+
+    # Pop off the actual game handlers
     window.pop_handlers()
-    gameover = resource.loadImage("gameover")
-    window.clear()
-    gameover.blit(0,0)
+
+    def on_draw():
+        window.clear()
+        gameover.draw()
+        return True
 
     def doClose(dt):
         window.close()
-    pyglet.clock.schedule_once(doClose, 2000)
+
+    window.push_handlers(on_draw)
+    pyglet.clock.schedule_once(doClose, 2)
 
 
 def pushGameEventHandlers(window, gs):
     def on_key_press(key, modifiers):
+        if key == pyglet.window.key.Q:
+            doGameOver(window)
         gs.player.on_key_press(gs, key)
 
     def on_key_release(key, modifiers):
