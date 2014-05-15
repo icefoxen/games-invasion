@@ -52,9 +52,6 @@ I really should have a much more powerful and high-level set of combinators for 
 interactions.  That would help a lot, I think.  But, no time to refactor!
 
 
-Name:
-Planet Pirates?
-
 
 Other buildings:
 Small shack
@@ -66,28 +63,39 @@ Defense bases?  Even if only decorative.
 
 
 
-Base weapon is a bigass axe.
-
 Skysmashers!
 
 
 Okay, outstanding issues:
+
+GRAPhICS
 No death effects for buildings
+Better background (how?)
+Hit effects should be better
+Art should be better.  Animations too.
+Planets could stand to be prettier
+The teleporter and capture beam are ugly
+Score and position display sucks
+Planet engine graphics suck and have no state indication
+
+PHYSICS
+Enemy bullets travel a radial distance, not a linear distance
 Radial position code sucks in general
-Drawing is slow.
+
+GAMEPLAY & MISC
 EASY TO GET LOST -- make the universe wrap, make a minimap or global map
 Sound is a little extreme
 No music
-Hit effects should be better
-Art should be better
-Planets could stand to be prettier
-The teleporter and capture beam are ugly
 Enemies don't invade you back
-Enemy bullets travel a radial distance, not a linear distance
 Universe generation sucks
-Score and position display sucks
-More enemies and variety in behavior
-Better background (how?)
+More enemies and variety in behavior -- skysmashers, marines that jump, civvies should be more obvious
+There should be other planets with engines and such
+Powerups!
+
+WISHLIST:
+Component based?
+Levels?
+Variable screen size?
 
 Slow things:
 sprite.draw
@@ -108,8 +116,3 @@ pygame.draw.circle
 pygame.surface.fill
 pygame.surface.get_size
 
-Wishlist:
-Component based?
-SDL2?
-Levels?
-Variable screen size?
