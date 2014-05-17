@@ -154,9 +154,8 @@ class GameState(object):
         s.planets.append(p)
 
     def initUniverse(s):
-        # FIX: disabled for testing
-        #for i in range(20):
-        #    s.addRandomPlanet()
+        for i in range(20):
+            s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
         p.color = 0 # XXX pygame.Color(200, 0, 0)
@@ -193,6 +192,7 @@ class GameState(object):
         if not s.player.alive:
             s.gameRunning = False
 
+    # XXX: This is dumb, you should be using vector math.
     def screenCoords(s, loc):
         screenx = int(loc[0] - s.camerax) + (s.screenW / 2)
         screeny = int(loc[1] - s.cameray) + (s.screenH / 2)
@@ -206,7 +206,7 @@ class GameState(object):
 
 # Should facing be a unit vector???
 class PhysicsObj(object):
-    def __init__(s, loc, mass=1.0, facing=-PIOVERTWO):
+    def __init__(s, loc, mass=1.0, facing=0):
         #GameObj.__init__(s)
         s.loc = loc
         s.mass = mass
@@ -288,12 +288,8 @@ class Planet(PhysicsObj):
         b = Civvie()
         s.addSurfFeature(b, loc)
 
-    # FIX: Something here _might_ not draw quite right
-    # in terms of coordinates.
     def draw(s, surf, gs):
         sx, sy = gs.screenCoords(s.loc)
-        #sx -= s.radius
-        #sy -= s.radius
         s.sprite.x = sx
         s.sprite.y = sy
         s.sprite.draw()
@@ -479,11 +475,8 @@ class SurfFeature(object):
             s.parent = parent
             s.radius = parent.radius + 1.0
 
-    # FIX:
-    # Okay, ONE thing wrong is that pyglet's 0,0 for a sprite
-    # is the bottom-left corner...
     def draw(s, surf, gs):
-        rot = s.parent.facing - s.loc
+        rot = s.parent.facing + s.loc
         totalAngle = vec.fromAngle(rot)
         offsetVec = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offsetVec)
@@ -492,19 +485,9 @@ class SurfFeature(object):
         # Add a slight offset to center the image rather than drawing
         # it from the lower-left corner...
         # Also add oregano.
-        s.sprite.rotation = vec.rad2degree(s.loc + s.parent.facing)
-        #scx -= s.sprite.width / 2
-        #scy -= s.sprite.height / 2
+        s.sprite.rotation = math.degrees(s.loc + s.parent.facing)
+        #print s.sprite.rotation, s.loc, s.parent.facing
         s.sprite.position = (scx, scy)
-        #s.sprite.draw()
-        #return
-        #rot = s.parent.facing - s.loc
-        #totalAngle = vec.fromAngle(rot)
-        #offset = vec.mul(totalAngle, s.radius)
-        #location = vec.add(s.parent.loc, offset)
-        #sc = gs.screenCoords(location)
-        #s.sprite.position = sc
-        print s.sprite.image.anchor_x, s.sprite.image.anchor_y
         s.sprite.draw()
 
 
@@ -850,7 +833,7 @@ class Blade(SurfFeature):
     def update(s, gs, dt):
         SurfFeature.update(s, gs, dt)
         s.radius = s.creator.radius
-        s.loc = s.creator.loc #+ (s.direction)# * 0.2)
+        s.loc = s.creator.loc + (s.direction) * 0.2
         s.lifetime -= dt
         things = s.parent.surfFeatures
         if s.lifetime < 0.0:
@@ -864,7 +847,6 @@ class Blade(SurfFeature):
 
     # XXX: Not quite right; need to either fudge angles based on planet size
     # or do a coordinate transform to put it at a fixed pixel offset from the parent.
-    # XXX Why is this not drawing?  Ordering maybe?
     def draw(s, surf, gs):
         if s.direction > 0:
             swing = 8.5 - (s.lifetime * 6.0)
@@ -874,8 +856,9 @@ class Blade(SurfFeature):
         totalAngle = vec.fromAngle(rot)
         offset = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offset)
-        s.sprite.position = location
-        s.sprite.rotation = vec.rad2degree(rot)
+        s.sprite.position = gs.screenCoords(location)
+        #print location
+        s.sprite.rotation = math.degrees(rot)
         s.sprite.draw()
 
 

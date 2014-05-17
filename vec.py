@@ -46,10 +46,12 @@ def unit(v):
 def dot(v1, v2):
     return (v1[0] * v2[0]) + (v1[1] * v2[1])
 
-# Angle is in radians
+# Angle is in radians,
+# increasing counterclockwise, 
+# with the origin facing right.
 def fromAngle(angle):
-    x = math.cos(angle)
-    y = math.sin(angle)
+    x = math.sin(angle)
+    y = math.cos(angle)
     return new(x, y)
 
 def toAngle(v):
@@ -94,15 +96,12 @@ def angleBetween(v1, v2):
     # return math.acos(res)
 
 def rotate(v, angle):
-    x = v[0] * math.cos(angle) - v[1] * math.sin(angle)
-    y = v[0] * math.sin(angle) + v[1] * math.cos(angle)
+    ca = math.cos(angle)
+    sa = math.sin(angle)
+    x = v[0] * ca - v[1] * sa
+    y = v[0] * sa + v[1] * ca
     return new(x, y)
 
 def invert(v):
     return mul(v, -1.0)
 
-def rad2degree(rads):
-    return rads * (180 / math.pi)
-
-def degree2rad(deg):
-    return deg * (math.pi / 180)
