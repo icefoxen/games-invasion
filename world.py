@@ -223,9 +223,9 @@ class GameObj(object):
 
 
 # Should facing be a unit vector???
-class PhysicsObj(GameObj):
+class PhysicsObj(object):
     def __init__(s, loc, mass=1.0, facing=-PIOVERTWO):
-        GameObj.__init__(s)
+        #GameObj.__init__(s)
         s.loc = loc
         s.mass = mass
         s.facing = facing
@@ -253,7 +253,7 @@ class PhysicsObj(GameObj):
 
 
     def update(s, gs, dt):
-        GameObj.update(s, gs, dt)
+        #GameObj.update(s, gs, dt)
         s.updatePhysics(dt)
 
 class Planet(PhysicsObj):
@@ -306,6 +306,8 @@ class Planet(PhysicsObj):
         b = Civvie()
         s.addSurfFeature(b, loc)
 
+    # FIX: Something here _might_ not draw quite right
+    # in terms of coordinates.
     def draw(s, surf, gs):
         sx, sy = gs.screenCoords(s.loc)
         sx -= s.radius
@@ -326,7 +328,6 @@ class Planet(PhysicsObj):
             PhysicsObj.update(s, gs, dt)
         else:
             #print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(p), vec.mag(p), s.parent.facing))
-            GameObj.update(s, gs, dt)
             # To figure out the current facing we must know what our parent's facing is,
             # where we were facing when captured, and where the parent was facing when captured.
             s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
@@ -472,13 +473,14 @@ class SteerablePlanet(Planet):
 # Notable mainly in that it keeps its location relative to the parent planet...
 # Parent must be a planet, at the moment.
 # Thus captured planets could count as these?  Hrm.
-class SurfFeature(GameObj):
+class SurfFeature(object):
     def __init__(s):
-        GameObj.__init__(s)
+        #GameObj.__init__(s)
         s.parent = None
         s.loc = 0.0
         s.size = 0.1
         s.hits = 10
+        s.alive = True
         s.sprite = resource.getSprite("test")
         s.radius = 0.0
         s.hitCooldown = 0.0
@@ -488,7 +490,6 @@ class SurfFeature(GameObj):
         s.dieSound = resource.getSound("buildingdie")
 
     def die(s, gs):
-        GameObj.die(s, gs)
         s.dieSound.play()
 
     def setParent(s, parent):
@@ -534,7 +535,9 @@ class SurfFeature(GameObj):
 
 
     def update(s, gs, dt):
-        GameObj.update(s, gs, dt)
+        if s.hits < 1:
+            s.alive = False
+
         s.hitCooldown -= dt
         s.loc = s.loc % TWOPI
 
