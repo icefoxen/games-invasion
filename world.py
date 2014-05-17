@@ -310,8 +310,8 @@ class Planet(PhysicsObj):
             # where we were facing when captured, and where the parent was facing when captured.
             s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
 
-            rotation = s.parent.facing - s.capturedParentFacing + math.pi
-            p = vec.rotate(s.parentVec, rotation)
+            rotation = s.parent.facing + s.capturedParentFacing + math.pi
+            p = vec.rotate(s.parentVec, -rotation)
             # THAT FUCKING SIMPLE AAAAAAAAAAH
             relativePosition = vec.add(s.parent.loc, p)
             s.loc = relativePosition
