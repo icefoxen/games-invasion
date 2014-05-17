@@ -154,8 +154,9 @@ class GameState(object):
         s.planets.append(p)
 
     def initUniverse(s):
-        for i in range(20):
-            s.addRandomPlanet()
+        # FIX: disabled for testing
+        #for i in range(20):
+        #    s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
         p.color = 0 # XXX pygame.Color(200, 0, 0)
@@ -201,25 +202,6 @@ class GameState(object):
         s.particles.append(part)
 
         
-
-
-class GameObj(object):
-    def __init__(s):
-        s.loc = vec.new(0.0, 0.0)
-        s.hits = 10
-        s.alive = True
-
-    def draw(s, surf, gs):
-        pass
-
-    def die(s, gs):
-        pass
-
-    def update(s, gs, dt):
-        if s.hits < 1:
-            s.alive = False
-        #print("Gameobj at {0}".format(s.loc))
-
 
 
 # Should facing be a unit vector???
@@ -310,8 +292,8 @@ class Planet(PhysicsObj):
     # in terms of coordinates.
     def draw(s, surf, gs):
         sx, sy = gs.screenCoords(s.loc)
-        sx -= s.radius
-        sy -= s.radius
+        #sx -= s.radius
+        #sy -= s.radius
         s.sprite.x = sx
         s.sprite.y = sy
         s.sprite.draw()
@@ -497,22 +479,32 @@ class SurfFeature(object):
             s.parent = parent
             s.radius = parent.radius + 1.0
 
+    # FIX:
+    # Okay, ONE thing wrong is that pyglet's 0,0 for a sprite
+    # is the bottom-left corner...
     def draw(s, surf, gs):
         rot = s.parent.facing - s.loc
         totalAngle = vec.fromAngle(rot)
         offsetVec = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offsetVec)
-        sc = gs.screenCoords(location)
-        s.sprite.position = sc
-        s.sprite.draw()
-        return
-        rot = s.parent.facing - s.loc
-        totalAngle = vec.fromAngle(rot)
-        offset = vec.mul(totalAngle, s.radius)
-        location = vec.add(s.parent.loc, offset)
-        sc = gs.screenCoords(location)
-        s.sprite.position = sc
+        (scx, scy) = gs.screenCoords(location)
+        #print "rot: %s, totalAngle: %s, offsetVec: %s, location: %s, sc: %s" % (rot, totalAngle, offsetVec, location, (scx, scy))
+        # Add a slight offset to center the image rather than drawing
+        # it from the lower-left corner...
+        # Also add oregano.
         s.sprite.rotation = vec.rad2degree(s.loc + s.parent.facing)
+        #scx -= s.sprite.width / 2
+        #scy -= s.sprite.height / 2
+        s.sprite.position = (scx, scy)
+        #s.sprite.draw()
+        #return
+        #rot = s.parent.facing - s.loc
+        #totalAngle = vec.fromAngle(rot)
+        #offset = vec.mul(totalAngle, s.radius)
+        #location = vec.add(s.parent.loc, offset)
+        #sc = gs.screenCoords(location)
+        #s.sprite.position = sc
+        print s.sprite.image.anchor_x, s.sprite.image.anchor_y
         s.sprite.draw()
 
 
@@ -541,6 +533,7 @@ class SurfFeature(object):
         s.hitCooldown -= dt
         s.loc = s.loc % TWOPI
 
+    # XXX: This has the same range problem as bullets
     def isTouching(s, other):
         lvec = vec.fromAngle(s.loc)
         olvec = vec.fromAngle(other.loc)

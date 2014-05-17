@@ -22,10 +22,12 @@ import resource
 # Again, oh well!  That's state machines for you.  Especially
 # sort of implicit ones.
 def doTitleScreen(window):
+    w = window.width
+    h = window.height
     logo = resource.getSprite("logo")
-    logo.position = (0,0)
+    logo.position = (w/2,h/2)
     title = resource.getSprite("title")
-    title.position = (0,0)
+    title.position = (w/2,h/2)
 
     def draw_logo():
         window.clear()
@@ -47,7 +49,7 @@ def doTitleScreen(window):
 
 def doGameOver(window):
     gameover = resource.getSprite("gameover")
-    gameover.position = (0,0)
+    gameover.position = (window.width/2,window.height/2)
 
     # Pop off the actual game handlers
     window.pop_handlers()

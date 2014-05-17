@@ -31,6 +31,10 @@ def getImage(name):
 
 def getSprite(name):
     img = getImage(name)
+    # Set the point the image gets rotated around
+    # to the image's center.
+    img.anchor_x = img.width / 2.0
+    img.anchor_y = img.height / 2.0
     return pyglet.sprite.Sprite(img)
 
 
