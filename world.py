@@ -295,19 +295,33 @@ class Planet(PhysicsObj):
         sx, sy = gs.screenCoords(s.loc)
         s.sprite.x = sx
         s.sprite.y = sy
+        s.sprite.rotation = math.degrees(s.facing)
         s.sprite.draw()
         if s.parent != None:
             #parentSloc = gs.screenCoords(s.parent.loc)
-            # The 'line' sprite is 100 units long.
-            connectionSprite = resource.getSprite('line')
             vecToParent = vec.sub(s.parent.loc, s.loc)
-            length = vec.mag(vecToParent) / 100.0
-            connectionSprite.scale = length
             angle = math.degrees(-(vec.toAngle(vecToParent) + PIOVERTWO))
-            connectionSprite.rotation = angle
-            pos = vec.add(s.loc, vec.div(vecToParent, 2))
-            connectionSprite.position = gs.screenCoords(pos)
-            connectionSprite.draw()
+            # The 'line' sprite is 10 units long.
+            lengthOfConnection = 10
+            increment = vec.mul(vec.unit(vecToParent), lengthOfConnection)
+            numIncrements = int(math.ceil(vec.mag(vecToParent) / lengthOfConnection))
+            currentPos = vec.add(s.loc, vec.div(increment, 2))
+            # The batch should NOT be recreated on each draw call!
+            #batch = pyglet.graphics.Batch()
+            #segments = []
+            for i in range(numIncrements):
+                connectionSprite = resource.getSprite('line2')
+                connectionSprite.rotation = angle
+                connectionSprite.position = gs.screenCoords(currentPos)
+                connectionSprite.draw()
+                currentPos = vec.add(currentPos, increment)
+                #segments.add(connectionSprite)
+                #connectionSprite.batch = batch
+            #batch.draw()
+            #connectionSprite.rotation = angle
+            #pos = vec.add(s.loc, vec.div(vecToParent, 2))
+            #connectionSprite.position = gs.screenCoords(pos)
+            #connectionSprite.draw()
             # XXX pygame.draw.line(surf, pygame.Color(0, 0, 255), sloc, parentSloc)
     
     
