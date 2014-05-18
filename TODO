@@ -100,7 +100,8 @@ Enemy bullets travel a radial distance, not a linear distance
 Radial position code sucks in general
 
 GAMEPLAY & MISC
-EASY TO GET LOST -- make the universe wrap, make a minimap or global map
+EASY TO GET LOST -- make the universe wrap, make a minimap or global map  --Oh!  Just a planet proximity locator; arrows on
+the edge of the screen!
 Sound is a little extreme
 No music
 Hit effects should be better

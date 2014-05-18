@@ -7,7 +7,6 @@ import random
 
 import particles
 import resource
-#import sprite
 import vec
 
 TWOPI = math.pi * 2
@@ -108,6 +107,10 @@ class GameState(object):
         r = random.randrange(50, 200)
         p = Planet(vec.new(x, y), r)
 
+        theta = random.random() * TWOPI
+        r = 350
+        p.loc = vec.new(math.cos(theta) * r, math.sin(theta) * r)
+
         p.vel = vec.new(vx, vy)
         p.facing = facing
 
@@ -154,7 +157,7 @@ class GameState(object):
         s.planets.append(p)
 
     def initUniverse(s):
-        for i in range(20):
+        for i in range(10):
             s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
@@ -262,7 +265,7 @@ class Planet(PhysicsObj):
         s.sprite.scale = scale
 
     def _getPlanetSprite(self):
-        return resource.getSprite('planet')
+        return resource.getSprite('planet2')
 
 
     def addSurfFeature(s, feat, loc):
@@ -294,7 +297,17 @@ class Planet(PhysicsObj):
         s.sprite.y = sy
         s.sprite.draw()
         if s.parent != None:
-            parentSloc = gs.screenCoords(s.parent.loc)
+            #parentSloc = gs.screenCoords(s.parent.loc)
+            # The 'line' sprite is 100 units long.
+            connectionSprite = resource.getSprite('line')
+            vecToParent = vec.sub(s.parent.loc, s.loc)
+            length = vec.mag(vecToParent) / 100.0
+            connectionSprite.scale = length
+            angle = math.degrees(-(vec.toAngle(vecToParent) + PIOVERTWO))
+            connectionSprite.rotation = angle
+            pos = vec.add(s.loc, vec.div(vecToParent, 2))
+            connectionSprite.position = gs.screenCoords(pos)
+            connectionSprite.draw()
             # XXX pygame.draw.line(surf, pygame.Color(0, 0, 255), sloc, parentSloc)
     
     
@@ -305,7 +318,6 @@ class Planet(PhysicsObj):
         if s.parent == None:
             PhysicsObj.update(s, gs, dt)
         else:
-            #print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(p), vec.mag(p), s.parent.facing))
             # To figure out the current facing we must know what our parent's facing is,
             # where we were facing when captured, and where the parent was facing when captured.
             s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
@@ -313,7 +325,8 @@ class Planet(PhysicsObj):
             rotation = s.parent.facing + s.capturedParentFacing + math.pi
             p = vec.rotate(s.parentVec, -rotation)
             # THAT FUCKING SIMPLE AAAAAAAAAAH
-            relativePosition = vec.add(s.parent.loc, p)
+            relativePosition = vec.add(vec.invert(s.parent.loc), p)
+            #print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(p), vec.mag(p), s.parent.facing))
             s.loc = relativePosition
 
             
@@ -626,6 +639,10 @@ class Dude(SurfFeature):
             elif key == keys.Z:
                 # Try uncapture
                 # XXX: At the moment we can't uncapture from the child side... hmm.
+                # XXX: At the moment also, if there are multiple planets
+                # captured close to each other, it essentially releases
+                # one at random rather than doing the one closest to 
+                # where you're standing.
                 for p in s.parent.children:
                     # This is a little fucked up but should work...
                     facingpoint = (s.parent.facing + s.loc) % TWOPI
