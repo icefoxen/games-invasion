@@ -291,6 +291,10 @@ class Planet(PhysicsObj):
         b = Civvie()
         s.addSurfFeature(b, loc)
 
+    # XXX: We shouldn't create hundreds of sprites each draw call.
+    # The best way to do this is actually prolly to blit the lines
+    # onto a texture once, and then just use that, which can then
+    # be translated and rotated and such as necessary.
     def draw(s, surf, gs):
         sx, sy = gs.screenCoords(s.loc)
         s.sprite.x = sx
