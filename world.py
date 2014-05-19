@@ -263,6 +263,7 @@ class Planet(PhysicsObj):
         s.sprite = s._getPlanetSprite()
         scale = radius / 64.0
         s.sprite.scale = scale
+        s.captureSprite = None
 
     def _getPlanetSprite(self):
         return resource.getSprite('planet2')
@@ -305,6 +306,13 @@ class Planet(PhysicsObj):
             #parentSloc = gs.screenCoords(s.parent.loc)
             vecToParent = vec.sub(s.parent.loc, s.loc)
             angle = math.degrees(-(vec.toAngle(vecToParent) + PIOVERTWO))
+
+            centerPointVec = vec.div(vecToParent, -2)
+            s.captureSprite.position = gs.screenCoords(centerPointVec)
+            s.captureSprite.rotation = angle
+            s.captureSprite.draw()
+            return
+
             # The 'line' sprite is 10 units long.
             lengthOfConnection = 10
             increment = vec.mul(vec.unit(vecToParent), lengthOfConnection)
@@ -390,6 +398,26 @@ class Planet(PhysicsObj):
                 return False
             return vec.within(s.loc, targetPlanet.loc, distance)
 
+    def genCaptureImage(s):
+        # Some paranoid error checking
+        if not s.parent:
+            raise Exception("Tried to generate capture image with nonexistant parent!")
+        vecToParent = vec.sub(s.parent.loc, s.loc)
+        distanceToParent = vec.mag(vecToParent)
+        #(px, py) = vecToParent
+        ropeImage = resource.getImage('line2').get_image_data()
+        img = pyglet.image.create(ropeImage.width, int(distanceToParent)).get_texture()
+        print img
+        img.anchor_x = img.width // 2
+        img.anchor_y = img.height // 2
+
+        # Now we have the image, we fill it up with the
+        # capture-rope images.
+        for i in range(0, int(distanceToParent), ropeImage.height):
+            img.blit_into(ropeImage, i, 0, 0)
+
+        s.captureSprite = pyglet.sprite.Sprite(img)
+
     def capture(s, victimPlanet):
         # This vector points from self to the victim planet
         distance = vec.sub(s.loc, victimPlanet.loc)
@@ -398,12 +426,14 @@ class Planet(PhysicsObj):
         victimPlanet.capturedFacing = victimPlanet.facing
         victimPlanet.capturedParentFacing = s.facing
         s.children.append(victimPlanet)
+        victimPlanet.genCaptureImage()
         
 
     def uncapture(s, victimPlanet):
         if victimPlanet in s.children:
             s.children.remove(victimPlanet)
             victimPlanet.parent = None
+            victimPlanet.captureSprite = None
 
         
 
