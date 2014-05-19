@@ -405,16 +405,22 @@ class Planet(PhysicsObj):
         vecToParent = vec.sub(s.parent.loc, s.loc)
         distanceToParent = vec.mag(vecToParent)
         #(px, py) = vecToParent
+        # It appears that we can blit image_data (software image data
+        # in main memory) to a texture (hardware image data on the GPU)
+        # but not any other way.
         ropeImage = resource.getImage('line2').get_image_data()
         img = pyglet.image.create(ropeImage.width, int(distanceToParent)).get_texture()
-        print img
         img.anchor_x = img.width // 2
         img.anchor_y = img.height // 2
 
         # Now we have the image, we fill it up with the
         # capture-rope images.
         for i in range(0, int(distanceToParent), ropeImage.height):
-            img.blit_into(ropeImage, i, 0, 0)
+            #print 'foo', i, img.height, ropeImage.height
+            # This crashes horribly if we try to blit outside the bounds
+            # of img
+            # XXX: Which seems to happen rarely but not often???
+            img.blit_into(ropeImage, 0, i, 0)
 
         s.captureSprite = pyglet.sprite.Sprite(img)
 
