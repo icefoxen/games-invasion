@@ -511,7 +511,7 @@ class SurfFeature(object):
             s.parent = parent
             s.radius = parent.radius + 1.0
 
-    def draw(s, surf, gs):
+    def draw(s, gs):
         rot = s.parent.facing + s.loc
         totalAngle = vec.fromAngle(rot)
         offsetVec = vec.mul(totalAngle, s.radius)
@@ -887,7 +887,7 @@ class Blade(SurfFeature):
 
     # XXX: Not quite right; need to either fudge angles based on planet size
     # or do a coordinate transform to put it at a fixed pixel offset from the parent.
-    def draw(s, surf, gs):
+    def draw(s, gs):
         if s.direction > 0:
             swing = 8.5 - (s.lifetime * 6.0)
         else:

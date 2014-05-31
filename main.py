@@ -94,14 +94,14 @@ def main():
     @window.event
     def on_draw():
         window.clear()
-        gs.background.draw(window, gs)
-        gs.player.draw(window, gs)
+        gs.background.draw(gs)
+        gs.player.draw(gs)
         for p in gs.particles:
-            p.draw(window, gs)
+            p.draw(gs)
         for p in gs.planets:
-            p.draw(window, gs)
+            p.draw(gs)
             for f in p.surfFeatures:
-                f.draw(window, gs)
+                f.draw(gs)
                 
         fpsDisplay.draw()
 

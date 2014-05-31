@@ -13,7 +13,7 @@ class Particle(object):
     def __init__(s, loc, vel, image, life):
         s.loc = loc
         s.vel = vel
-        s.img = resource.getSprite(image)
+        s.sprite = resource.getSprite(image)
         s.life = life
         s.alive = True
 
@@ -24,9 +24,10 @@ class Particle(object):
         if s.life < 0:
             s.alive = False
 
-    def draw(s, surf, gs):
+    def draw(s, gs):
         sloc = gs.screenCoords(s.loc)
-        surf.position = sloc
+        s.sprite.position = sloc
+        s.sprite.draw()
         # XXX: surf.blit() # s.img, sloc)
         
 
