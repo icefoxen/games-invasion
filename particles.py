@@ -61,7 +61,7 @@ class WarpSpark(Particle):
 # Spits out a stream of particles.
 # Good for engine trails, blood splatters, smoke...
 class ParticlePlume(object):
-    def __init__(s, particle, speed=1.0, angle=1.0, count=20, interval=0.1):
+    def __init__(s, particle, speed=1.0, angle=30.0, count=20, interval=0.1):
         s.particleType = particle
         s.speed = speed
         s.angle = angle
@@ -88,7 +88,7 @@ class ParticlePlume(object):
 def spray(gs, particle, loc, vel, count):
     for i in range(count):
         velscale = random.gauss(vel, (vel / 3.0))
-        direction = random.random() * TWOPI
+        direction = random.random() * 360
         velvec = vec.mul(vec.fromAngle(direction), velscale)
         p = particle(loc, velvec)
         gs.addParticle(p)

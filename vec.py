@@ -49,13 +49,17 @@ def dot(v1, v2):
 # Angle is in radians,
 # increasing counterclockwise, 
 # with the origin facing right.
+# NO MORE
+# Angle is in degrees, increasing clockwise,
+# with the origin facing up
 def fromAngle(angle):
-    x = math.sin(angle)
-    y = math.cos(angle)
+    rads = math.radians(angle)
+    x = math.sin(rads)
+    y = math.cos(rads)
     return new(x, y)
 
 def toAngle(v):
-    return math.atan2(v[1], v[0])
+    return -math.degrees(math.atan2(v[1], v[0]))+90
 
 def toInt(v):
     return (int(v[0]), int(v[1]))
@@ -85,19 +89,13 @@ def perpendicular(v):
 
 # Returns angle between two vectors.
 # Fails for zero vectors, but we shouldn't have those anyway.
-def angleBetween(v1, v2):
-    return math.atan2(v2[1], v2[0]) - math.atan2(v1[1], v1[0])
-    # d = dot(v1, v2)
-    # den = mag(v1) * mag(v2)
-    # # Aiee floating point errors
-    # res = min(1.0, d/den)
-    # #print(res)
-    # #print(res > 1.0)
-    # return math.acos(res)
+def angleBetween((ax, ay), (bx, by)):
+    return math.degrees(math.atan2(by, bx) - math.atan2(ay, ax))
 
 def rotate(v, angle):
-    ca = math.cos(angle)
-    sa = math.sin(angle)
+    rads = math.radians(angle)
+    ca = math.cos(rads)
+    sa = math.sin(rads)
     x = v[0] * ca - v[1] * sa
     y = v[0] * sa + v[1] * ca
     return new(x, y)

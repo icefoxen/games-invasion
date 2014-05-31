@@ -13,6 +13,8 @@ TWOPI = math.pi * 2
 PIOVERTWO = math.pi / 2
 PIOVERFOUR = math.pi / 4
 
+def randomAngle():
+    return random.random() * 360
 
 # XXX: Make this work
 class Background(object):
@@ -107,7 +109,7 @@ class GameState(object):
         r = random.randrange(50, 200)
         p = Planet(vec.new(x, y), r)
 
-        theta = random.random() * TWOPI
+        theta = randomAngle()
         r = 350
         p.loc = vec.new(math.cos(theta) * r, math.sin(theta) * r)
 
@@ -157,8 +159,8 @@ class GameState(object):
         s.planets.append(p)
 
     def initUniverse(s):
-        for i in range(10):
-            s.addRandomPlanet()
+        #for i in range(10):
+        #    s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
         p.color = 0 # XXX pygame.Color(200, 0, 0)
@@ -171,8 +173,6 @@ class GameState(object):
     def update(s, dt):
         #print("# of particles: %d" % len(s.particles))
         for i in s.planets:
-            #s.camerax = i.x
-            #s.cameray = i.y
             i.update(s, dt)
             for f in i.surfFeatures:
                 f.update(s, dt)
@@ -225,7 +225,7 @@ class PhysicsObj(object):
     def updatePhysics(s, dt):
         s.loc = vec.add(s.loc, vec.mul(s.vel, dt))
         s.facing = s.facing + (s.rvel * dt)
-        s.facing = s.facing % TWOPI
+        s.facing = s.facing % 360
 
     # XXX: Enforce max speed and max rotational speed!
     def applyForce(s, force):
@@ -276,19 +276,19 @@ class Planet(PhysicsObj):
 
     def addBuilding(s, typ, loc=None):
         if loc == None:
-            loc = random.random() * TWOPI
+            loc = randomAngle()
         b = Building(typ)
         s.addSurfFeature(b, loc)
 
     def addSoldier(s, loc=None):
         if loc == None:
-            loc = random.random() * TWOPI
+            loc = randomAngle()
         b = Soldier()
         s.addSurfFeature(b, loc)
 
     def addCivvie(s, loc=None):
         if loc == None:
-            loc = random.random() * TWOPI
+            loc = randomAngle()
         b = Civvie()
         s.addSurfFeature(b, loc)
 
@@ -296,12 +296,12 @@ class Planet(PhysicsObj):
         sx, sy = gs.screenCoords(s.loc)
         s.sprite.x = sx
         s.sprite.y = sy
-        s.sprite.rotation = math.degrees(s.facing)
+        s.sprite.rotation = s.facing
         s.sprite.draw()
         if s.parent != None:
             #parentSloc = gs.screenCoords(s.parent.loc)
             vecToParent = vec.sub(s.parent.loc, s.loc)
-            angle = math.degrees(-(vec.toAngle(vecToParent) + PIOVERTWO))
+            angle = vec.toAngle(vecToParent)
 
             centerPointVec = vec.div(vecToParent, -2)
             s.captureSprite.position = gs.screenCoords(centerPointVec)
@@ -423,7 +423,7 @@ class SteerablePlanet(Planet):
         s.thrusting = False
         s.turning = 0
         s.thrustForce = 1000.0
-        s.turnForce = 100.0
+        s.turnForce = 1000.0
         # Invaders are red!
         #s.color = pygame.Color(200, 0, 0)
 
@@ -433,7 +433,7 @@ class SteerablePlanet(Planet):
         s.controller = None
         s.controlPoint = 0.0
 
-        s.driveEmitter = particles.ParticlePlume(particles.DriveParticle, speed=80.0, angle=0.5, count=3, interval=0.05)
+        s.driveEmitter = particles.ParticlePlume(particles.DriveParticle, speed=80.0, angle=30.0, count=3, interval=0.05)
         s.engineSound = resource.getSound("engine")
 
     def clearInput(s):
@@ -465,7 +465,7 @@ class SteerablePlanet(Planet):
         #print(s.vel)
         if s.thrusting:
             force = s.thrustForce * dt
-            facing = vec.fromAngle(s.facing + math.pi)
+            facing = vec.fromAngle(s.facing + 180)
             f = vec.mul(facing, force)
             s.applyForce(f)
 
@@ -515,13 +515,13 @@ class SurfFeature(object):
         rot = s.parent.facing + s.loc
         totalAngle = vec.fromAngle(rot)
         offsetVec = vec.mul(totalAngle, s.radius)
-        location = vec.add(s.parent.loc, offsetVec)
+        location = vec.add(s.parent.loc, offsetVec
         (scx, scy) = gs.screenCoords(location)
         #print "rot: %s, totalAngle: %s, offsetVec: %s, location: %s, sc: %s" % (rot, totalAngle, offsetVec, location, (scx, scy))
         # Add a slight offset to center the image rather than drawing
         # it from the lower-left corner...
         # Also add oregano.
-        s.sprite.rotation = math.degrees(s.loc + s.parent.facing)
+        s.sprite.rotation = s.loc + s.parent.facing
         #print s.sprite.rotation, s.loc, s.parent.facing
         s.sprite.position = (scx, scy)
         s.sprite.draw()
@@ -550,7 +550,7 @@ class SurfFeature(object):
             s.alive = False
 
         s.hitCooldown -= dt
-        s.loc = s.loc % TWOPI
+        s.loc = s.loc % 360
 
     # XXX: This has the same range problem as bullets
     def isTouching(s, other):
@@ -587,7 +587,7 @@ class Building(SurfFeature):
 class Dude(SurfFeature):
     def __init__(s):
         SurfFeature.__init__(s)
-        s.speed = 0.4
+        s.speed = 10.0
         s.moving = 0
         s.controlling = False
         s.captureRange = 500
@@ -616,7 +616,7 @@ class Dude(SurfFeature):
         locvec = vec.fromAngle(s.loc)
         controlpointvec = vec.fromAngle(s.parent.controlPoint)
         diff = vec.angleBetween(locvec, controlpointvec)
-        if abs(diff) < 0.2:
+        if abs(diff) < 10.0:
             #print("Took control")
             s.controlling = True
             s.loc = s.parent.controlPoint
@@ -648,7 +648,7 @@ class Dude(SurfFeature):
                 # Try capture some nearby planet...
                 #print("Trying capture...")
                 for p in gs.planets:
-                    facingpoint = (s.parent.facing + s.loc) % TWOPI
+                    facingpoint = (s.parent.facing + s.loc) % 360
                     #print("Trying to capture {0} at facing {1}".format(p, facingpoint))
                     # XXX: Make it only capture the closest planet, dammit!
                     # XXX: Ideally it will also go off the distance between the planet
@@ -668,7 +668,7 @@ class Dude(SurfFeature):
                 # where you're standing.
                 for p in s.parent.children:
                     # This is a little fucked up but should work...
-                    facingpoint = (s.parent.facing + s.loc) % TWOPI
+                    facingpoint = (s.parent.facing + s.loc) % 360
                     facingvec = vec.fromAngle(facingpoint)
                     offset = vec.sub(p.loc, s.parent.loc)
                     diff = vec.angleBetween(facingvec, offset)
@@ -690,7 +690,7 @@ class Dude(SurfFeature):
             elif key == keys.UP:
                 # Transport to captured planet.
                 for p in s.parent.children:
-                    facingpoint = (s.parent.facing + s.loc) % TWOPI
+                    facingpoint = (s.parent.facing + s.loc) % 360
                     facingvec = vec.fromAngle(facingpoint)
                     offset = vec.sub(p.loc, s.parent.loc)
                     diff = vec.angleBetween(facingvec, offset)
@@ -708,7 +708,7 @@ class Dude(SurfFeature):
                 # Oooor, if this planet is captured, you can go back to the parent
                 if s.parent.parent != None:
                     p = s.parent.parent
-                    facingpoint = (s.parent.facing + s.loc) % TWOPI
+                    facingpoint = (s.parent.facing + s.loc) % 360
                     facingvec = vec.fromAngle(facingpoint)
                     offset = vec.sub(p.loc, s.parent.loc)
                     diff = vec.angleBetween(facingvec, offset)
@@ -859,7 +859,6 @@ class Blade(SurfFeature):
         s.radius += 2.0
         s.creator = creator
         s.size = 0.15
-        # XXX: Shit, mirroring?
         s.spriteRight = resource.getSprite("bladeRight")
         s.spriteLeft = resource.getSprite("bladeLeft")
         s.setSprite()
@@ -888,17 +887,19 @@ class Blade(SurfFeature):
     # XXX: Not quite right; need to either fudge angles based on planet size
     # or do a coordinate transform to put it at a fixed pixel offset from the parent.
     def draw(s, gs):
+        swingSpeed = 160.0 # Degrees per second
+        startingFacing = 90.0
         if s.direction > 0:
-            swing = 8.5 - (s.lifetime * 6.0)
+            swing = startingFacing + -(s.lifetime * swingSpeed)
         else:
-            swing = (s.lifetime * 6.0) - 2.0
+            swing = (s.lifetime * swingSpeed) - startingFacing 
         rot = s.parent.facing + s.loc
         totalAngle = vec.fromAngle(rot)
         offset = vec.mul(totalAngle, s.radius)
         location = vec.add(s.parent.loc, offset)
         s.sprite.position = gs.screenCoords(location)
         #print location
-        s.sprite.rotation = math.degrees(rot) + math.degrees(swing)
+        s.sprite.rotation = rot + swing
         s.sprite.draw()
 
 
@@ -940,15 +941,15 @@ class AI(object):
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
-        desiredDistance = PIOVERFOUR
-        if distance > PIOVERFOUR:
+        desiredDistance = 45
+        if distance > 45:
             s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
         elif distance > 0:
             s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
             s.controlled.on_key_press(gs, keys.LEFT)
-        elif distance < -PIOVERFOUR:
+        elif distance < -45:
             s.controlled.on_key_press(gs, keys.LEFT)
             s.controlled.attack(gs)
         elif distance < 0:
