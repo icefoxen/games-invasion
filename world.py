@@ -898,7 +898,7 @@ class Blade(SurfFeature):
         location = vec.add(s.parent.loc, offset)
         s.sprite.position = gs.screenCoords(location)
         #print location
-        s.sprite.rotation = math.degrees(rot)
+        s.sprite.rotation = math.degrees(rot) + math.degrees(swing)
         s.sprite.draw()
 
 
