@@ -159,8 +159,8 @@ class GameState(object):
         s.planets.append(p)
 
     def initUniverse(s):
-        #for i in range(10):
-        #    s.addRandomPlanet()
+        for i in range(4):
+            s.addRandomPlanet()
         p = SteerablePlanet(vec.ZERO, 80.0)
         # Invaders are red!
         p.color = 0 # XXX pygame.Color(200, 0, 0)
@@ -320,7 +320,7 @@ class Planet(PhysicsObj):
             # where we were facing when captured, and where the parent was facing when captured.
             s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
 
-            rotation = s.parent.facing + s.capturedParentFacing + math.pi
+            rotation = s.parent.facing + s.capturedParentFacing + 180
             p = vec.rotate(s.parentVec, -rotation)
             # THAT FUCKING SIMPLE AAAAAAAAAAH
             relativePosition = vec.add(vec.invert(s.parent.loc), p)
@@ -422,8 +422,8 @@ class SteerablePlanet(Planet):
         
         s.thrusting = False
         s.turning = 0
-        s.thrustForce = 1000.0
-        s.turnForce = 1000.0
+        s.thrustForce = 2000.0
+        s.turnForce = 2000.0
         # Invaders are red!
         #s.color = pygame.Color(200, 0, 0)
 
@@ -492,7 +492,7 @@ class SurfFeature(object):
         #GameObj.__init__(s)
         s.parent = None
         s.loc = 0.0
-        s.size = 0.1
+        s.size = 2.0
         s.hits = 10
         s.alive = True
         s.sprite = resource.getSprite("test")
@@ -515,7 +515,7 @@ class SurfFeature(object):
         rot = s.parent.facing + s.loc
         totalAngle = vec.fromAngle(rot)
         offsetVec = vec.mul(totalAngle, s.radius)
-        location = vec.add(s.parent.loc, offsetVec
+        location = vec.add(s.parent.loc, offsetVec)
         (scx, scy) = gs.screenCoords(location)
         #print "rot: %s, totalAngle: %s, offsetVec: %s, location: %s, sc: %s" % (rot, totalAngle, offsetVec, location, (scx, scy))
         # Add a slight offset to center the image rather than drawing
@@ -553,6 +553,7 @@ class SurfFeature(object):
         s.loc = s.loc % 360
 
     # XXX: This has the same range problem as bullets
+    # XXX: This also doesn't really handle vertical size correctly.
     def isTouching(s, other):
         lvec = vec.fromAngle(s.loc)
         olvec = vec.fromAngle(other.loc)
@@ -566,11 +567,11 @@ class SurfFeature(object):
 
 BUILDING = {
     # Building name : (building sprite, size, hits)
-    'small' : ("smallbuilding", 0.15, 10),
-    'medium' : ("mediumbuilding", 0.2, 20),
-    'large' : ("largebuilding", 0.2, 30),
+    'small' : ("smallbuilding", 8.5, 10),
+    'medium' : ("mediumbuilding", 12.0, 20),
+    'large' : ("largebuilding", 12.0, 30),
     # Engines aren't invulnerable, but at the moment they might as well be.
-    'engine' : ("engine", 0.2, 30000000000000),
+    'engine' : ("engine", 12.0, 30000000000000),
 }
 
 class Building(SurfFeature):
@@ -587,7 +588,7 @@ class Building(SurfFeature):
 class Dude(SurfFeature):
     def __init__(s):
         SurfFeature.__init__(s)
-        s.speed = 10.0
+        s.speed = 15.0
         s.moving = 0
         s.controlling = False
         s.captureRange = 500
@@ -689,16 +690,17 @@ class Dude(SurfFeature):
 
             elif key == keys.UP:
                 # Transport to captured planet.
+                teleportAngle = 10.0
                 for p in s.parent.children:
                     facingpoint = (s.parent.facing + s.loc) % 360
                     facingvec = vec.fromAngle(facingpoint)
                     offset = vec.sub(p.loc, s.parent.loc)
                     diff = vec.angleBetween(facingvec, offset)
 
-                    if abs(diff) < 0.2 and s.transportCooldown <= 0.0:
+                    if abs(diff) < teleportAngle and s.transportCooldown <= 0.0:
                         s.sprayParticles(gs, particles.WarpSpark, 50, 30)
                         facingdiff = s.parent.facing - p.facing
-                        s.loc += facingdiff + math.pi
+                        s.loc += facingdiff + 180
                         s.setParent(p)
                         s.transportCooldown = s.transportCooldownTotal
                         s.sprayParticles(gs, particles.WarpSpark, 50, 30)
@@ -712,10 +714,10 @@ class Dude(SurfFeature):
                     facingvec = vec.fromAngle(facingpoint)
                     offset = vec.sub(p.loc, s.parent.loc)
                     diff = vec.angleBetween(facingvec, offset)
-                    if abs(diff) < 0.2 and s.transportCooldown <= 0.0:
+                    if abs(diff) < teleportAngle and s.transportCooldown <= 0.0:
                         s.sprayParticles(gs, particles.WarpSpark, 50, 30)
                         facingdiff = s.parent.facing - p.facing
-                        s.loc += facingdiff + math.pi
+                        s.loc += facingdiff + 180
                         s.setParent(p)
                         s.transportCooldown = s.transportCooldownTotal
                         s.sprayParticles(gs, particles.WarpSpark, 50, 30)
@@ -830,7 +832,7 @@ class Bullet(SurfFeature):
         s.setParent(s)
         s.radius += 2.0
         s.creator = creator
-        s.size = 0.05
+        s.size = 1.0
         s.sprite = resource.getSprite("bullet")
 
     def update(s, gs, dt):
@@ -858,7 +860,7 @@ class Blade(SurfFeature):
         s.setParent(s)
         s.radius += 2.0
         s.creator = creator
-        s.size = 0.15
+        s.size = 10.0
         s.spriteRight = resource.getSprite("bladeRight")
         s.spriteLeft = resource.getSprite("bladeLeft")
         s.setSprite()
