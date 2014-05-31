@@ -1,32 +1,5 @@
-
-Oh shit sound effects!
-What sound effects do we need?
- * Bullet fire
- * Sword swing
- * Jump
- * Capture
- * Teleport
- * Invader hit
- * Enemy hit
- * Enemy destoyed
- * Invader destroyed
- * Building destroyed
-
-
-Well we have sound effects now, but they don't freakin' work on Linux!  Ugh!
-
 Destroying an engine should make the planet unsteerable!
 
-
-Damage effects when someone is hit (invader should have green blood)
-Clean up planet-snagging code and make it choose closest planet
-Make cutting a vine work on either end of it
-Graphics improvements:
- * Draw order
- * Vines?
- * Particles for blood, hit effects, vines/teleporter, breaking vines (fragments!), fire/smoke,
-   planet rotation,
- * Fix graphics offset so things rest on the surface
 
 Clean up universe gen code some...  Add minimap or other indicators?
 Performance???  Can we profile?
@@ -82,22 +55,12 @@ Planets could stand to be prettier
 The teleporter and capture beam are ugly
 Score and position display sucks
 Planet engine graphics suck and have no state indication
+Drawing order
 
 PHYSICS
 Enemy bullets travel a radial distance, not a linear distance
-Radial position code sucks in general
-No death effects for buildings
-Better background (how?)
-Hit effects should be better
-Art should be better.  Animations too.
-Planets could stand to be prettier
-The teleporter and capture beam are ugly
-Score and position display sucks
-Planet engine graphics suck and have no state indication
-
-PHYSICS
-Enemy bullets travel a radial distance, not a linear distance
-Radial position code sucks in general
+Radial position code sucks in general, switching it all to be linear would be nice
+Switching everything to degrees would make life easier too
 
 GAMEPLAY & MISC
 EASY TO GET LOST -- make the universe wrap, make a minimap or global map  --Oh!  Just a planet proximity locator; arrows on
