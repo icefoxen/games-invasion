@@ -32,7 +32,7 @@ class Background(object):
     # coordinates into that spits out a list of X appropriate stars
     # for the area...
     # XXX: Still, this needs to be made better.
-    def draw(s, surf, gs):
+    def draw(s, gs):
         starstep = 100
         # This would be nicer if it worked.  But, screw it for now.  More important things.
         # nearx = int(gs.camerax - (gs.camerax % starstep)) - (gs.screenW / 2) + starstep
@@ -292,11 +292,7 @@ class Planet(PhysicsObj):
         b = Civvie()
         s.addSurfFeature(b, loc)
 
-    # XXX: We shouldn't create hundreds of sprites each draw call.
-    # The best way to do this is actually prolly to blit the lines
-    # onto a texture once, and then just use that, which can then
-    # be translated and rotated and such as necessary.
-    def draw(s, surf, gs):
+    def draw(s, gs):
         sx, sy = gs.screenCoords(s.loc)
         s.sprite.x = sx
         s.sprite.y = sy
@@ -311,30 +307,6 @@ class Planet(PhysicsObj):
             s.captureSprite.position = gs.screenCoords(centerPointVec)
             s.captureSprite.rotation = angle
             s.captureSprite.draw()
-            return
-
-            # The 'line' sprite is 10 units long.
-            lengthOfConnection = 10
-            increment = vec.mul(vec.unit(vecToParent), lengthOfConnection)
-            numIncrements = int(math.ceil(vec.mag(vecToParent) / lengthOfConnection))
-            currentPos = vec.add(s.loc, vec.div(increment, 2))
-            # The batch should NOT be recreated on each draw call!
-            #batch = pyglet.graphics.Batch()
-            #segments = []
-            for i in range(numIncrements):
-                connectionSprite = resource.getSprite('line2')
-                connectionSprite.rotation = angle
-                connectionSprite.position = gs.screenCoords(currentPos)
-                connectionSprite.draw()
-                currentPos = vec.add(currentPos, increment)
-                #segments.add(connectionSprite)
-                #connectionSprite.batch = batch
-            #batch.draw()
-            #connectionSprite.rotation = angle
-            #pos = vec.add(s.loc, vec.div(vecToParent, 2))
-            #connectionSprite.position = gs.screenCoords(pos)
-            #connectionSprite.draw()
-            # XXX pygame.draw.line(surf, pygame.Color(0, 0, 255), sloc, parentSloc)
     
     
     # A bit of an ugly hack, buuuuut...
@@ -399,12 +371,12 @@ class Planet(PhysicsObj):
             return vec.within(s.loc, targetPlanet.loc, distance)
 
     def genCaptureImage(s):
+        """Builds a line sprite of the right length to go to the capturing planet."""
         # Some paranoid error checking
         if not s.parent:
             raise Exception("Tried to generate capture image with nonexistant parent!")
         vecToParent = vec.sub(s.parent.loc, s.loc)
         distanceToParent = vec.mag(vecToParent)
-        #(px, py) = vecToParent
         # It appears that we can blit image_data (software image data
         # in main memory) to a texture (hardware image data on the GPU)
         # but not any other way.
@@ -417,9 +389,6 @@ class Planet(PhysicsObj):
         # capture-rope images.
         for i in range(0, int(distanceToParent), ropeImage.height):
             #print 'foo', i, img.height, ropeImage.height
-            # This crashes horribly if we try to blit outside the bounds
-            # of img
-            # XXX: Which seems to happen rarely but not often???
             img.blit_into(ropeImage, 0, i, 0)
 
         s.captureSprite = pyglet.sprite.Sprite(img)
