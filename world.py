@@ -302,9 +302,9 @@ class Planet(PhysicsObj):
             #parentSloc = gs.screenCoords(s.parent.loc)
             vecToParent = vec.sub(s.parent.loc, s.loc)
             angle = vec.toAngle(vecToParent)
-
-            centerPointVec = vec.div(vecToParent, -2)
-            s.captureSprite.position = gs.screenCoords(centerPointVec)
+            centerPointVec = vec.div(vecToParent, 2)
+            actualVec = vec.add(s.loc, centerPointVec)
+            s.captureSprite.position = gs.screenCoords(actualVec)
             s.captureSprite.rotation = angle
             s.captureSprite.draw()
     
@@ -318,14 +318,13 @@ class Planet(PhysicsObj):
         else:
             # To figure out the current facing we must know what our parent's facing is,
             # where we were facing when captured, and where the parent was facing when captured.
-            s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
-
-            rotation = s.parent.facing + s.capturedParentFacing + 180
-            p = vec.rotate(s.parentVec, -rotation)
-            # THAT FUCKING SIMPLE AAAAAAAAAAH
-            relativePosition = vec.add(vec.invert(s.parent.loc), p)
-            #print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(p), vec.mag(p), s.parent.facing))
-            s.loc = relativePosition
+            s.facing = s.capturedFacing + s.parent.facing + \
+                s.capturedParentFacing
+            rotationAroundParent = s.parent.facing + s.capturedParentFacing
+            relativePosition = vec.rotate(vec.invert(s.parentVec), -rotationAroundParent)
+            absolutePosition = vec.add(s.parent.loc, relativePosition)
+            print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(relativePosition), vec.mag(relativePosition), s.parent.facing))
+            s.loc = absolutePosition
 
             
 

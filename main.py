@@ -81,8 +81,8 @@ def pushGameEventHandlers(window, gs):
 
 def main():
     # TODO: Choose resolution
-    screenw = 800
-    screenh = 600
+    screenw = 1024
+    screenh = 768
     window = pyglet.window.Window(width=screenw, height=screenh)
     window.set_vsync(False)
     # XXX: The animation state here is a little wibbly, work on it.
