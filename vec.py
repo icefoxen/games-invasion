@@ -92,6 +92,12 @@ def perpendicular(v):
 def angleBetween((ax, ay), (bx, by)):
     return math.degrees(math.atan2(by, bx) - math.atan2(ay, ax))
 
+# Returns true if the two vectors are within the given number
+# of degrees from each other
+def angleWithin(va, vb, angle):
+    ang = angleBetween(va, vb)
+    return (ang <= angle) or ((360 - ang) <= angle)
+
 def rotate(v, angle):
     rads = math.radians(angle)
     ca = math.cos(rads)

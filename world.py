@@ -770,8 +770,8 @@ class Civvie(Dude):
         Dude.__init__(s)
         s.hits = 10
         s.sprite = resource.getSprite('civvie')
-        s.aiCooldown = 0.0
         s.aiCooldownMax = 1.0
+        s.aiCooldown = random.random() * s.aiCooldownMax
         s.ai = CivvieAI(s)
 
 
@@ -789,8 +789,8 @@ class Soldier(Dude):
         Dude.__init__(s)
         s.hits = 20
         s.sprite = resource.getSprite('soldier')
-        s.aiCooldown = 0.0
         s.aiCooldownMax = 1.5
+        s.aiCooldown = random.random() * s.aiCooldownMax
         s.ai = SoldierAI(s)
         s.damageParticle = particles.BloodSplat
 
@@ -831,7 +831,7 @@ class Bullet(SurfFeature):
         SurfFeature.__init__(s)
         #s.loc = creator.loc + (direction * 0.2)
         s.direction = direction
-        s.speed = 0.9
+        s.speed = 52.0
         s.lifetime = 1.0
         s.setParent(s)
         s.radius += 2.0
@@ -943,20 +943,44 @@ class AI(object):
     def doAttack(s, gs):
         s.controlled.on_key_release(gs, keys.LEFT)
         s.controlled.on_key_release(gs, keys.RIGHT)
+        target = gs.player.loc
+        distance = (s.controlled.loc - target) % 360
+        desiredDistance = 30
+        if distance < desiredDistance:
+            # Move further away
+            s.controlled.on_key_press(gs, keys.LEFT)
+            s.controlled.attack(gs)
+            s.controlled.on_key_press(gs, keys.RIGHT)
+        elif distance > (360 - desiredDistance):
+            # Move further away
+            s.controlled.on_key_press(gs, keys.RIGHT)
+            s.controlled.attack(gs)
+            s.controlled.on_key_press(gs, keys.LEFT)
+        elif distance < 180: # and distance > desiredDistance, implicitly
+            # Move closer
+            s.controlled.on_key_press(gs, keys.LEFT)
+            s.controlled.attack(gs)
+        elif distance > 180: # and distance < (360 - desiredDistance), implicitly
+            # Move closer
+            s.controlled.on_key_press(gs, keys.RIGHT)
+            s.controlled.attack(gs)
+        return
+
         runfrom = gs.player.loc
         rvloc = vec.fromAngle(runfrom - s.controlled.loc)
         reference = vec.fromAngle(0)
         distance = vec.angleBetween(reference, rvloc)
-        desiredDistance = 45
-        if distance > 45:
-            s.controlled.on_key_press(gs, keys.RIGHT)
+        print "Distance:", distance
+        desiredDistance = 25
+        if distance > desiredDistance:
+            s.controlled.on_key_press(gs, keys.LEFT)
             s.controlled.attack(gs)
         elif distance > 0:
             s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
             s.controlled.on_key_press(gs, keys.LEFT)
-        elif distance < -45:
-            s.controlled.on_key_press(gs, keys.LEFT)
+        elif distance < -desiredDistance:
+            s.controlled.on_key_press(gs, keys.RIGHT)
             s.controlled.attack(gs)
         elif distance < 0:
             s.controlled.on_key_press(gs, keys.LEFT)
@@ -970,12 +994,9 @@ class AI(object):
     def doRun(s, gs):
         s.controlled.on_key_release(gs, keys.LEFT)
         s.controlled.on_key_release(gs, keys.RIGHT)
-        # I don't believe it this freakin' works.
         runfrom = gs.player.loc
-        rvloc = vec.fromAngle(runfrom - s.controlled.loc)
-        reference = vec.fromAngle(0)
-        distance = vec.angleBetween(reference, rvloc)
-        if distance < 0:
+        distance = (s.controlled.loc - runfrom) % 360
+        if distance < 180:
             s.controlled.on_key_press(gs, keys.RIGHT)
         else:
             s.controlled.on_key_press(gs, keys.LEFT)

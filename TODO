@@ -60,18 +60,13 @@ If you can capture a planet it should project a ghost capture beam to it to show
 
 PHYSICS
 Enemy bullets travel a radial distance, not a linear distance
-Radial position code sucks in general, switching it all to be linear would be nice
-Switching everything to degrees would make life easier too
+Radial position code sucks in general, switching it all to be linear would be nice... but I'm not sure I dare.
 
 GAMEPLAY & MISC
 EASY TO GET LOST -- make the universe wrap, make a minimap or global map  --Oh!  Just a planet proximity locator; arrows on
 the edge of the screen!
 Sound is a little extreme
 No music
-Hit effects should be better
-Art should be better
-Planets could stand to be prettier
-The teleporter and capture beam are ugly
 Enemies don't invade you back
 Enemy bullets travel a radial distance, not a linear distance
 Universe generation sucks
