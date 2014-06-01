@@ -264,6 +264,7 @@ class Planet(PhysicsObj):
         scale = radius / 64.0
         s.sprite.scale = scale
         s.captureSprite = None
+        s.capturable = True
 
     def _getPlanetSprite(self):
         return resource.getSprite('planet2')
@@ -316,15 +317,16 @@ class Planet(PhysicsObj):
         if s.parent == None:
             PhysicsObj.update(s, gs, dt)
         else:
-            # To figure out the current facing we must know what our parent's facing is,
-            # where we were facing when captured, and where the parent was facing when captured.
-            s.facing = s.capturedFacing + s.parent.facing + \
-                s.capturedParentFacing
-            rotationAroundParent = s.parent.facing + s.capturedParentFacing
-            relativePosition = vec.rotate(vec.invert(s.parentVec), -rotationAroundParent)
-            absolutePosition = vec.add(s.parent.loc, relativePosition)
-            print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(relativePosition), vec.mag(relativePosition), s.parent.facing))
-            s.loc = absolutePosition
+            #print("parent offset: {0}, parent direction {1}, parent distance {2}, parent facing {3}".format(s.parentVec, vec.toAngle(p), vec.mag(p), s.parent.facing))
+             # To figure out the current facing we must know what our parent's facing is,
+             # where we were facing when captured, and where the parent was facing when captured.
+            s.facing = s.capturedFacing + (s.parent.facing - s.capturedParentFacing)
+
+            rotation = s.parent.facing - s.capturedParentFacing +180
+            p = vec.rotate(s.parentVec, -rotation)
+            # THAT FUCKING SIMPLE AAAAAAAAAAH
+            relativePosition = vec.add(s.parent.loc, p)
+            s.loc = relativePosition
 
             
 
@@ -344,6 +346,8 @@ class Planet(PhysicsObj):
     # That seems nicer, actually.
     # XXX: Require a low relative velocity, as well??  Possibly!
     def canCapture(s, point, distance, targetPlanet):
+        if not targetPlanet.capturable:
+            return False
         if targetPlanet.parent != None:
             return False
         if targetPlanet == s:
@@ -434,6 +438,7 @@ class SteerablePlanet(Planet):
 
         s.driveEmitter = particles.ParticlePlume(particles.DriveParticle, speed=80.0, angle=30.0, count=3, interval=0.05)
         s.engineSound = resource.getSound("engine")
+        s.capturable = False
 
     def clearInput(s):
         s.thrusting = False
