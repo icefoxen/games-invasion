@@ -46,7 +46,7 @@ Skysmashers!
 
 Okay, outstanding issues:
 
-GRAPhICS
+GRAPHICS
 No death effects for buildings
 Better background (how?)
 Hit effects should be better
@@ -57,6 +57,7 @@ Score and position display sucks
 Planet engine graphics suck and have no state indication
 Drawing order
 If you can capture a planet it should project a ghost capture beam to it to show it's available
+If you are over a capture beam it should highlight it so you know where you're teleporting to
 
 PHYSICS
 Enemy bullets travel a radial distance, not a linear distance

@@ -95,6 +95,7 @@ def angleBetween((ax, ay), (bx, by)):
 # Returns true if the two vectors are within the given number
 # of degrees from each other
 def angleWithin(va, vb, angle):
+    angle /= 2
     ang = angleBetween(va, vb)
     return (ang <= angle) or ((360 - ang) <= angle)
 

@@ -347,13 +347,38 @@ class Planet(PhysicsObj):
     # XXX: Require a low relative velocity, as well??  Possibly!
     def canCapture(s, point, distance, targetPlanet):
         if not targetPlanet.capturable:
+            print "Nope, not capturable"
             return False
         if targetPlanet.parent != None:
+            print "Nope, has parent"
             return False
         if targetPlanet == s:
+            print "Nope, self"
             return False
         if s in targetPlanet.children:
+            print "Nope, is a child already"
             return False
+
+        vecBetweenPlanets = vec.sub(targetPlanet.loc, s.loc)
+        # Adjust distance to measure from surface to surface, not center
+        # to center
+        distance += s.radius + targetPlanet.radius
+        if vec.magSquared(vecBetweenPlanets) > (distance*distance):
+            print "Nope, out of range"
+            return False
+        
+        # Okay we are close enough to an eligible planet, are we facing it?
+        angleBetweenPlanets = vec.toAngle(vecBetweenPlanets)
+        # XXX XXX: Work on this next
+        if abs(angleBetweenPlanets - point) < 10:
+            print "Yep!"
+            return True
+
+        print "Nope, angle too great", angleBetweenPlanets, point, abs(angleBetweenPlanets - point)
+        return False
+
+
+
         vecBetweenPlanets = vec.sub(targetPlanet.loc, s.loc)
         vecBPU = vec.unit(vecBetweenPlanets)
         vecToPlanetEdge = vec.mul(vec.perpendicular(vecBPU), targetPlanet.radius)
