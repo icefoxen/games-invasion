@@ -6,6 +6,7 @@ import math
 import random
 
 import particles
+import prettyPlanets
 import resource
 import vec
 
@@ -266,7 +267,7 @@ class Planet(PhysicsObj):
         s.captureSprite = None
 
     def _getPlanetSprite(self):
-        return resource.getSprite('planet2')
+        return prettyPlanets.makePrettyPlanet()
 
 
     def addSurfFeature(s, feat, loc):
@@ -917,7 +918,7 @@ class Blade(SurfFeature):
     # XXX: Not quite right; need to either fudge angles based on planet size
     # or do a coordinate transform to put it at a fixed pixel offset from the parent.
     def draw(s, gs):
-        swingSpeed = 160.0 # Degrees per second
+        swingSpeed = 190.0 # Degrees per second
         startingFacing = 90.0
         if s.direction > 0:
             swing = startingFacing + -(s.lifetime * swingSpeed)

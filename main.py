@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pyglet
+import pyglet.text
 import pyglet.window.key
 import cProfile
 
@@ -79,6 +80,17 @@ def pushGameEventHandlers(window, gs):
     # Add basic handlers for keypresses and releases.
     window.push_handlers(on_key_press, on_key_release)    
 
+class GUI(object):
+    def __init__(s, gs):
+        s.gs = gs
+        s.hitsLabel = pyglet.text.Label(text='foo', x=10, y=10)
+
+    def update(s, dt):
+        s.hitsLabel.text = "Hits: {}".format(s.gs.player.hits)
+
+    def draw(s):
+        s.hitsLabel.draw()
+
 def main():
     # TODO: Choose resolution
     screenw = 1024
@@ -90,6 +102,7 @@ def main():
 
     gs = GameState(screenw, screenh)
     fpsDisplay = pyglet.clock.ClockDisplay()
+    gui = GUI(gs)
 
     @window.event
     def on_draw():
@@ -102,13 +115,15 @@ def main():
             p.draw(gs)
             for f in p.surfFeatures:
                 f.draw(gs)
-                
-        fpsDisplay.draw()
+        #fpsDisplay.draw()
+        gui.draw()
 
     def updateGame(dt):
-        gs.update(dt)
         if not gs.player.alive:
             doGameOver(window)
+        else:
+            gs.update(dt)
+            gui.update(dt)
     
     # Game physics get updated at 30FPS
     pyglet.clock.schedule_interval(updateGame, 1/30.0)

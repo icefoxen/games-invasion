@@ -25,16 +25,17 @@ def loadSound(name):
 IMAGES = {}
 def getImage(name):
     # Pyglet already caches images
-    return pyglet.resource.image(name + '.png')
+    img = pyglet.resource.image(name + '.png')
+    # Set the point the image gets rotated around
+    # to the image's center.
+    img.anchor_x = img.width / 2.0
+    img.anchor_y = img.height / 2.0
+    return img
 
 
 
 def getSprite(name):
     img = getImage(name)
-    # Set the point the image gets rotated around
-    # to the image's center.
-    img.anchor_x = img.width / 2.0
-    img.anchor_y = img.height / 2.0
     return pyglet.sprite.Sprite(img)
 
 
