@@ -47,6 +47,7 @@ Skysmashers!
 Okay, outstanding issues:
 
 GRAPHICS
+It looks like there's an issue with certain images being maybe slightly out-of-bounds along the edges and having positive alpha or something.
 No death effects for buildings
 Better background (how?)
 Hit effects should be better

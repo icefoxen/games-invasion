@@ -411,8 +411,8 @@ class Planet(PhysicsObj):
         # but not any other way.
         ropeImage = resource.getImage('line2').get_image_data()
         img = pyglet.image.create(ropeImage.width, int(distanceToParent)).get_texture()
-        img.anchor_x = img.width // 2
-        img.anchor_y = img.height // 2
+        img.anchor_x = int(img.width // 2)
+        img.anchor_y = int(img.height // 2)
 
         # Now we have the image, we fill it up with the
         # capture-rope images.

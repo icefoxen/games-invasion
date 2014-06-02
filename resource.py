@@ -28,8 +28,8 @@ def getImage(name):
     img = pyglet.resource.image(name + '.png')
     # Set the point the image gets rotated around
     # to the image's center.
-    img.anchor_x = img.width / 2.0
-    img.anchor_y = img.height / 2.0
+    img.anchor_x = int(img.width // 2)
+    img.anchor_y = int(img.height // 2)
     return img
 
 
