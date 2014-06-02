@@ -264,7 +264,6 @@ class Planet(PhysicsObj):
         scale = radius / 64.0
         s.sprite.scale = scale
         s.captureSprite = None
-        s.capturable = True
 
     def _getPlanetSprite(self):
         return resource.getSprite('planet2')
@@ -329,34 +328,31 @@ class Planet(PhysicsObj):
             s.loc = relativePosition
 
             
+    def isParent(s, planet):
+        """Returns true if the given planet is a parent of the current one or
+        any in the tree above it.
+        Useful for avoiding loops in the planet parentage tree."""
+        if s.parent != None:
+            return s.parent == planet or s.parent.isParent(planet)
+        else:
+            return False
 
 
     # Okay... so this function will attempt to snag another nearby planet.
-    # For each target, it draws a line from the center of this planet to the
-    # target; if the endpoint of the line is within the target planet, then
-    # it returns true.  False otherwise.
-    # So geometrically, we project a line segment from the center of the planet
-    # to the point on its surface, and then continue it by X distance to get the end point.
-    # We then check the distance between the end point and the center of the target planet.
-    # If it is less than the radius of the target planet, return true!
-    # ...hmm.
-    # Another way would be to find the angular size of the target planet, and then check whether
-    # the angle between the line segment and the center-to-center vector between the planets is
-    # bigger than the angular size... a couple dot products could do it.
-    # That seems nicer, actually.
+    # It just checks if we're near enough to it and if we are more or less facing it.
     # XXX: Require a low relative velocity, as well??  Possibly!
     def canCapture(s, point, distance, targetPlanet):
-        if not targetPlanet.capturable:
-            print "Nope, not capturable"
+        if s.isParent(targetPlanet):
+            #print "Nope, is parent"
             return False
         if targetPlanet.parent != None:
-            print "Nope, has parent"
+            #print "Nope, has parent"
             return False
         if targetPlanet == s:
-            print "Nope, self"
+            #print "Nope, self"
             return False
         if s in targetPlanet.children:
-            print "Nope, is a child already"
+            #print "Nope, is a child already"
             return False
 
         vecBetweenPlanets = vec.sub(targetPlanet.loc, s.loc)
@@ -364,17 +360,21 @@ class Planet(PhysicsObj):
         # to center
         distance += s.radius + targetPlanet.radius
         if vec.magSquared(vecBetweenPlanets) > (distance*distance):
-            print "Nope, out of range"
+            #print "Nope, out of range"
             return False
         
         # Okay we are close enough to an eligible planet, are we facing it?
         angleBetweenPlanets = vec.toAngle(vecBetweenPlanets)
-        # XXX XXX: Work on this next
+        # Urrrrrg I hate this, -180 to 180 and 0-360 behave differently and both are
+        # awful in different situations so neither one is really correct.
+        point = (point + 360) % 360
+        angleBetweenPlanets = (angleBetweenPlanets + 360) % 360
+        print "Point and angle:", point, angleBetweenPlanets
         if abs(angleBetweenPlanets - point) < 10:
-            print "Yep!"
+            #print "Yep!"
             return True
 
-        print "Nope, angle too great", angleBetweenPlanets, point, abs(angleBetweenPlanets - point)
+        #print "Nope, angle too great", angleBetweenPlanets, point, abs(angleBetweenPlanets - point)
         return False
 
 
@@ -463,7 +463,6 @@ class SteerablePlanet(Planet):
 
         s.driveEmitter = particles.ParticlePlume(particles.DriveParticle, speed=80.0, angle=30.0, count=3, interval=0.05)
         s.engineSound = resource.getSound("engine")
-        s.capturable = False
 
     def clearInput(s):
         s.thrusting = False
