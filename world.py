@@ -1,5 +1,6 @@
 
 import pyglet
+import pyglet.media
 import pyglet.window.key as keys
 
 import math
@@ -267,7 +268,7 @@ class Planet(PhysicsObj):
         s.captureSprite = None
 
     def _getPlanetSprite(self):
-        return prettyPlanets.makePrettyPlanet()
+        return pyglet.sprite.Sprite(prettyPlanets.makePrettyPlanet())
 
 
     def addSurfFeature(s, feat, loc):
@@ -370,7 +371,7 @@ class Planet(PhysicsObj):
         # awful in different situations so neither one is really correct.
         point = (point + 360) % 360
         angleBetweenPlanets = (angleBetweenPlanets + 360) % 360
-        print "Point and angle:", point, angleBetweenPlanets
+        #print "Point and angle:", point, angleBetweenPlanets
         if abs(angleBetweenPlanets - point) < 10:
             #print "Yep!"
             return True
@@ -464,6 +465,9 @@ class SteerablePlanet(Planet):
 
         s.driveEmitter = particles.ParticlePlume(particles.DriveParticle, speed=80.0, angle=30.0, count=3, interval=0.05)
         s.engineSound = resource.getSound("engine")
+        s.engineSoundPlayer = pyglet.media.Player()
+        s.engineSoundPlayer.queue(s.engineSound)
+        
 
     def clearInput(s):
         s.thrusting = False
@@ -472,7 +476,6 @@ class SteerablePlanet(Planet):
     def on_key_press(s, gs, key):
         if key == keys.UP:
             s.thrusting = True
-            s.engineSound.play() # loops=-1, fade_ms=200)
             
         elif key == keys.LEFT:
             s.turning = -1.0
@@ -482,8 +485,6 @@ class SteerablePlanet(Planet):
     def on_key_release(s, gs, key):
         if key == keys.UP:
             s.thrusting = False
-            # XXX
-            # s.engineSound.fadeout(500)
         elif key == keys.LEFT:
             s.turning = 0
         elif key == keys.RIGHT:
@@ -503,6 +504,13 @@ class SteerablePlanet(Planet):
             loc = vec.add(s.loc, offset)
 #            v = vec.invert(s.vel)
             s.driveEmitter.emit(gs, dt, loc, s.facing, vel=s.vel)
+
+            if not s.engineSoundPlayer.playing:
+                s.engineSoundPlayer.seek(0.0)
+                s.engineSoundPlayer.eos_action = s.engineSoundPlayer.EOS_LOOP
+                s.engineSoundPlayer.play()
+        else:
+            s.engineSoundPlayer.eos_action = s.engineSoundPlayer.EOS_PAUSE
 
         # Turning should be either 0, -1 or +1
         if s.turning != 0:

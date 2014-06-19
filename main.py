@@ -115,7 +115,7 @@ def main():
             p.draw(gs)
             for f in p.surfFeatures:
                 f.draw(gs)
-        #fpsDisplay.draw()
+        fpsDisplay.draw()
         gui.draw()
 
     def updateGame(dt):
