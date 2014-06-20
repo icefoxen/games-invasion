@@ -845,6 +845,7 @@ class Soldier(Dude):
 class Invader(Dude):
     def __init__(s):
         Dude.__init__(s)
+        s.speed = 20.0
         s.hits = 50
         s.sprite = resource.getSprite('invader')
         s.damageParticle = particles.AlienBloodSplat

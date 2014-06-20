@@ -27,8 +27,10 @@ def doTitleScreen(window):
     h = window.height
     logo = resource.getSprite("logo")
     logo.position = (w/2,h/2)
+    logo.scale = float(w) / float(logo.width)
     title = resource.getSprite("title")
     title.position = (w/2,h/2)
+    title.scale = float(w) / float(title.width)
 
     def draw_logo():
         window.clear()
@@ -51,6 +53,7 @@ def doTitleScreen(window):
 def doGameOver(window):
     gameover = resource.getSprite("gameover")
     gameover.position = (window.width/2,window.height/2)
+    gameover.scale = float(window.width) / float(gameover.width)
 
     # Pop off the actual game handlers
     window.pop_handlers()
